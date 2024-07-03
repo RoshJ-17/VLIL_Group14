@@ -1,4 +1,55 @@
 {
-  "model": "TabNet",
-  "task": "cbh_prediction"
+    "split_type": "mixed_stratified",
+    "features": [
+        "BT_11",
+        "BT_12",
+        "BTD",
+        "lat",
+        "lon",
+        "CTT",
+        "CTH",
+        "Cloud_Mask_Raw",
+        "Cloud_Phase"
+    ],
+    "target": "ERA5_CBH",
+    "baseline": {
+        "MAE": 2266.132672568416,
+        "RMSE": 3255.97091560709,
+        "R2": 1.134043703387988e-08,
+        "Bias": -0.4652093061813387
+    },
+    "train": {
+        "MAE": 781.0176391601562,
+        "RMSE": 1468.73974609375,
+        "R2": 0.7964220355617265,
+        "Bias": 97.65658569335938
+    },
+    "validation": {
+        "MAE": 819.5307006835938,
+        "RMSE": 1560.583740234375,
+        "R2": 0.7708224703719635,
+        "Bias": 101.02764129638672
+    },
+    "test": {
+        "MAE": 825.030517578125,
+        "RMSE": 1575.2684326171875,
+        "R2": 0.7659287383773209,
+        "Bias": 92.4453125
+    },
+    "tabnet_parameters": {
+        "n_d": 32,
+        "n_a": 32,
+        "n_steps": 5,
+        "gamma": 1.5,
+        "n_independent": 2,
+        "n_shared": 2,
+        "lambda_sparse": 0.0001,
+        "learning_rate": 0.02,
+        "batch_size": 8192,
+        "virtual_batch_size": 1024,
+        "max_epochs": 200,
+        "patience": 20,
+        "mask_type": "entmax",
+        "seed": 42
+    }
 }
