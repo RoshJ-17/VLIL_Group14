@@ -1,0 +1,4 @@
+{
+  "model": "FTTransformer",
+  "task": "cloud_type_classification"
+}

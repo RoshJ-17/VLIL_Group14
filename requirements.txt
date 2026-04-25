@@ -1,0 +1,10 @@
+# Core Requirements
+numpy
+pandas
+scikit-learn
+torch
+torchvision
+matplotlib
+seaborn
+scipy
+requests
