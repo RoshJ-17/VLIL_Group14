@@ -3,7 +3,7 @@
 A satellite-driven machine learning pipeline that processes multi-source remote sensing data over India to produce four weather intelligence outputs useful for aviation safety.
 
 **Data coverage:** 01 July 2022 – 30 June 2023  
-**Region:** India (5°–35°N, 65°–100°E)
+**Region:** India (6°–38°N, 68°–98°E)
 
 ---
 
