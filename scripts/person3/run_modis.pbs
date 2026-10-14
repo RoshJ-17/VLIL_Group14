@@ -1,0 +1,48 @@
+#!/bin/bash
+#PBS -N modis_extract
+#PBS -q workq
+#PBS -l nodes=1:ppn=4
+#PBS -l mem=32gb
+#PBS -l walltime=12:00:00
+#PBS -o modis_extract.out
+#PBS -e modis_extract.err
+
+cd /home/m_prathilothamai/aviation_weather_project
+
+# Activate Conda
+source /home/m_prathilothamai/anaconda3/etc/profile.d/conda.sh
+conda activate aviation
+
+echo "========================================"
+echo "MODIS EXTRACTION JOB"
+echo "========================================"
+echo "Date: $(date)"
+echo "Host: $(hostname)"
+echo "Python: $(which python)"
+echo "Python version:"
+python --version
+
+echo ""
+echo "MOD06 files:"
+find data/MOD06 -type f -name "*.hdf" | wc -l
+
+echo "MOD021 files:"
+find data/MOD021 -type f -name "*.hdf" | wc -l
+
+echo ""
+echo "Starting extraction..."
+echo "========================================"
+
+python 01_modis_extraction.py
+
+STATUS=$?
+
+echo ""
+echo "========================================"
+echo "Extraction finished"
+echo "Exit status: $STATUS"
+echo "Date: $(date)"
+echo "========================================"
+
+exit $STATUS
+
