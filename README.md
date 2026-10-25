@@ -2,9 +2,9 @@
 
 ## Overview
 
-This project develops a multisource satellite-based deep learning framework for aviation weather monitoring over India. It combines satellite observations, meteorological reanalysis data, precipitation products, and cloud-type reference labels to estimate weather conditions that may affect aviation operations.
+This project develops a multisource satellite-based deep learning framework for aviation weather monitoring over India. It integrates satellite observations, meteorological reanalysis data, precipitation products, and cloud-type reference labels to estimate weather conditions that may affect aviation operations.
 
-The framework focuses on four key weather-estimation tasks: cloud-type classification, cloud-base-height estimation, precipitation detection, and rainfall-rate estimation. These outputs are intended to support weather monitoring and provide useful information for aviation weather assessment.
+The framework covers four weather-estimation tasks: cloud-type classification, cloud-base-height estimation, precipitation detection, and rainfall-intensity estimation. The resulting outputs provide a foundation for weather monitoring and aviation weather decision support.
 
 **Study region:** India  
 **Study period:** July 1, 2022, to June 30, 2023
@@ -12,87 +12,202 @@ The framework focuses on four key weather-estimation tasks: cloud-type classific
 ## Features Summary
 
 ### 1. Multisource Weather Data Integration
-- Integrates data from multiple meteorological and satellite sources.
-- Uses MODIS observations, ERA5 reanalysis data, GPM IMERG precipitation products, and CALIPSO-derived cloud-type labels.
-- Supports the development of a unified dataset for multiple weather-estimation tasks.
+- Integrates MODIS satellite observations, ERA5 reanalysis data, GPM IMERG precipitation products, and CALIPSO-derived cloud-type labels.
+- Organizes raw and processed datasets for downstream model development.
+- Supports the preparation of task-specific training, validation, and testing datasets.
 
-### 2. Cloud Detection and Cloud Coverage Estimation
-- Supports cloud identification using available satellite-derived features.
-- Calculates cloud coverage from the available cloud-related data and classifications.
-- Provides regional cloud information that can complement the individual weather-estimation outputs.
+### 2. MODIS Data Processing
+- Extracts relevant information from MODIS MOD021KM and MOD06_L2 products.
+- Supports combining extracted MODIS chunks.
+- Provides MODIS-derived features for the integrated weather-estimation workflow.
 
 ### 3. Cloud-Type Classification
-- Uses the **TabM** deep learning model to classify cloud types.
-- Uses CALIPSO-derived labels as reference targets for model development and evaluation.
-- Helps characterize cloud conditions relevant to weather monitoring.
+- Trains a deep learning model for cloud-type classification using the prepared cloud-type dataset.
+- Uses CALIPSO-derived cloud-type labels as reference targets.
+- Includes model artifacts and classification evaluation outputs.
 
 ### 4. Cloud-Base-Height Estimation
-- Uses **TabM** to estimate cloud-base height.
-- Uses ERA5 cloud-base-height data as the reference for model training and evaluation.
-- Produces continuous height estimates for analyzing cloud conditions.
+- Uses ERA5 cloud-base-height data as the reference for model preparation and evaluation.
+- Includes scripts for matching ERA5 data and preparing cloud-base-height datasets.
+- Provides a trained model and evaluation outputs for cloud-base-height estimation.
 
 ### 5. Precipitation Detection
-- Uses **Oya-U-Net** for precipitation detection.
-- Formulates precipitation detection as a binary classification task using labels derived from GPM IMERG data.
-- Identifies whether precipitation is present in the evaluated samples.
+- Prepares precipitation-detection datasets using GPM-related processing workflows.
+- Includes a training workflow for precipitation detection.
+- Stores the trained model and evaluation results.
 
-### 6. Rainfall-Rate Estimation
-- Uses **Oya-QPE** to estimate rainfall rate.
-- Uses GPM IMERG precipitation data as the reference source.
-- Treats rainfall-rate estimation as a regression task to quantify precipitation intensity.
+### 6. Rainfall-Intensity Estimation
+- Prepares rainfall-intensity datasets for regression.
+- Includes a training workflow for rainfall-rate prediction.
+- Stores the trained model and evaluation outputs.
 
-### 7. Aviation Weather Decision Support
-- Brings together cloud, cloud-base-height, precipitation, and rainfall-rate estimates.
-- Provides a foundation for assessing weather conditions that may be relevant to aviation.
-- Supports the planned integration of regional cloud coverage, temporal weather trends, hazard persistence, and rule-based risk assessment.
-- Can be extended with model-explanation methods such as SHAP to help interpret predictions.
+### 7. Model Evaluation and Results
+- Organizes evaluation artifacts by weather-estimation task.
+- Includes metrics, classification reports, confusion matrices, feature-importance results, and other task-specific output files where available.
+- Separates trained model artifacts from evaluation outputs.
 
-> The framework is intended for research and decision-support development. It is not a certified aviation weather forecasting or operational air-traffic-control system.
+### 8. Aviation Weather Decision Support
+- Establishes a foundation for combining cloud, cloud-base-height, precipitation, and rainfall-intensity estimates.
+- Can support future integration of regional cloud coverage, temporal weather trends, hazard persistence, and rule-based risk indicators.
+- Provides a basis for adding model-explanation methods such as SHAP.
+
+> This repository is intended for research and decision-support development. It is not a certified aviation weather forecasting or operational air-traffic-control system.
+
+## Repository Structure
+
+```text
+VLIL_Group14/
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── .gitignore
+│
+├── data/
+│   ├── raw/
+│   │   └── modis/
+│   │       └── MOD021KM / MOD06_L2 ZIP and chunk files
+│   │
+│   └── processed/
+│       ├── cbh/
+│       │   └── train / val / test CSVs
+│       ├── cloud_type/
+│       │   └── train / val / test CSVs
+│       ├── pixel_level/
+│       │   └── modis_pixel.csv
+│       ├── precipitation_detection/
+│       │   └── processed CSV files
+│       └── rainfall_intensity/
+│           └── train / val / test CSVs
+│
+├── dataset/
+│   ├── download.py
+│   ├── noToken.py
+│   └── optimized.py
+│
+├── preprocessing/
+│   ├── calipso/
+│   │   ├── 05_create_cloud_labels.py
+│   │   ├── 06_create_cloudtype_final.py
+│   │   └── 07_split_cloudtype_dataset.py
+│   │
+│   ├── era5/
+│   │   ├── 03_match_era5_cbh.py
+│   │   ├── 04_prepare_cbh_v2.py
+│   │   └── create_cbh_mixed_day_stratified_split.py
+│   │
+│   └── modis/
+│       ├── 01_modis_extraction.py
+│       └── 02_combine_modis_chunks.py
+│
+├── scripts/
+│   ├── person1/
+│   │   ├── 04_download_era5_cbh.py
+│   │   ├── 06_download_era5_cbh_team_netcdf_person1.py
+│   │   ├── 06_verify_gpm_processed.py
+│   │   └── check_modis_dates.py
+│   │
+│   ├── person2/
+│   │   ├── 05_build_era5_required_cells.py
+│   │   ├── 05_download_era5_cbh_targeted.py
+│   │   ├── 05_download_extract_gpm.py
+│   │   ├── 06_download_era5_cbh_team_netcdf_person5.py
+│   │   ├── check_era5_requirements.py
+│   │   ├── era5_required_cells_temp.sqlite
+│   │   └── nano.save
+│   │
+│   ├── person3/
+│   │   ├── pairs.txt
+│   │   ├── 06_download_era5_cbh_team_netcdf_person2.py
+│   │   ├── 06_download_era5_cbh_team_netcdf_person4.py
+│   │   ├── 06_download_era5_cbh_team_netcdf_person6.py
+│   │   ├── check_values1709.py
+│   │   ├── match1509.py
+│   │   └── run_modis.pbs
+│   │
+│   └── person4/
+│       ├── 05_create_cloud_labels2.py
+│       ├── 06_create_cloudtype_final2.py
+│       ├── 06_download_era5_cbh_team_netcdf_person3.py
+│       ├── 07_match_modis_gpm.py
+│       ├── era5_download.log
+│       └── make_gpm_required_times.py
+│
+├── training/
+│   ├── cbh/
+│   │   └── train_cbh_tabnet_mixed_stratified.py
+│   ├── cloud_type/
+│   │   └── 08_train_cloudtype_fttransformer.py
+│   ├── precipitation_detection/
+│   │   └── 06_train_precip_tcn.py
+│   └── rainfall_intensity/
+│       └── 14_train_precip_rate_residual_mlp_v2_smote.py
+│
+├── evaluation/
+│   ├── cbh/
+│   │   ├── feature_importance.csv
+│   │   └── metrics.json
+│   ├── cloud_type/
+│   │   ├── classification_report.txt
+│   │   ├── config.json
+│   │   └── confusion_matrix.csv
+│   ├── precipitation_detection/
+│   │   └── evaluation result CSV files
+│   └── rainfall_intensity/
+│       └── evaluation result CSV files
+│
+└── models/
+    ├── cbh/
+    │   └── cbh_tabnet_mixed_stratified_model.zip
+    ├── cloud_type/
+    │   └── best_model.pt
+    ├── precipitation_detection/
+    │   └── precipitation_tcn.pt
+    └── rainfall_intensity/
+        └── precip_rate_residual_mlp_v2_smote.pt
+```
 
 ## Data Sources
 
-The project uses the following data sources:
-
-| Data source | Purpose |
+| Data source | Role in the project |
 |---|---|
-| MODIS MOD06_L2 | Cloud-related observations and products |
-| MODIS MOD021KM | Moderate Resolution Imaging Spectroradiometer Level-1B radiance observations |
-| ERA5 | Meteorological reanalysis data, including cloud-base height |
-| GPM IMERG | Precipitation information used for precipitation detection and rainfall-rate estimation |
+| MODIS MOD021KM | Level-1B radiance observations |
+| MODIS MOD06_L2 | Cloud-related satellite products |
+| ERA5 | Meteorological reanalysis, including cloud-base-height reference data |
+| GPM IMERG | Precipitation information for detection and rainfall-intensity estimation |
 | CALIPSO-derived labels | Reference labels for cloud-type classification |
 
-The availability, spatial and temporal alignment, and quality of the source data affect the final integrated dataset and model performance.
+The source datasets differ in format, resolution, and temporal coverage. Preprocessing scripts are used to extract, match, and prepare data for the downstream tasks.
 
-## Models and Estimation Tasks
+## Models and Training Workflows
 
-| Task | Model | Reference data | Task type |
-|---|---|---|---|
-| Cloud-type classification | TabM | CALIPSO-derived cloud-type labels | Classification |
-| Cloud-base-height estimation | TabM | ERA5 cloud-base height | Regression |
-| Precipitation detection | Oya-U-Net | GPM IMERG-derived precipitation labels | Binary classification |
-| Rainfall-rate estimation | Oya-QPE | GPM IMERG rainfall rate | Regression |
+| Task | Training script | Model artifact |
+|---|---|---|
+| Cloud-base-height estimation | `training/cbh/train_cbh_tabnet_mixed_stratified.py` | `models/cbh/cbh_tabnet_mixed_stratified_model.zip` |
+| Cloud-type classification | `training/cloud_type/08_train_cloudtype_fttransformer.py` | `models/cloud_type/best_model.pt` |
+| Precipitation detection | `training/precipitation_detection/06_train_precip_tcn.py` | `models/precipitation_detection/precipitation_tcn.pt` |
+| Rainfall-intensity estimation | `training/rainfall_intensity/14_train_precip_rate_residual_mlp_v2_smote.py` | `models/rainfall_intensity/precip_rate_residual_mlp_v2_smote.pt` |
+
+The script and artifact names above describe the repository layout. The actual architecture, training options, input features, and target definitions should be verified in the corresponding source files.
 
 ## Installation and Setup
 
 ### Prerequisites
 
-- Python 3.10 or a version compatible with the project's dependencies
+- Python version compatible with `requirements.txt`
 - Git
 - `pip`
-- Git Large File Storage (Git LFS), if the repository uses it
-- A compatible operating system: macOS or Linux
+- Git LFS, if required for tracked large files
+- macOS or Linux
 - Optional GPU support for accelerated training
 
-Clone the repository and move into its directory:
+### 1. Clone the Repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd <YOUR_REPOSITORY_NAME>
+git clone https://github.com/RoshJ-17/VLIL_Group14.git
+cd VLIL_Group14
 ```
 
-Replace the placeholders with your actual GitHub repository URL and repository directory name.
-
-### 1. Create a Virtual Environment
+### 2. Create and Activate a Virtual Environment
 
 On macOS or Linux:
 
@@ -101,30 +216,30 @@ python3 -m venv aviation
 source aviation/bin/activate
 ```
 
-Upgrade the package installer:
+Upgrade `pip`:
 
 ```bash
 python -m pip install --upgrade pip
 ```
 
-### 2. Install the Requirements
-
-If the repository contains a `requirements.txt` file, install its dependencies:
+### 3. Install Project Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Install Additional Packages
-
-Depending on which scripts you run, the project may require the following packages:
+Additional packages may be required depending on the scripts you intend to run:
 
 ```bash
 pip install pyhdf beautifulsoup4 xarray netCDF4 joblib
 pip install pytorch-tabnet tab-transformer-pytorch imbalanced-learn
 ```
 
-Install Git LFS if it is used to track files in the repository.
+Check `requirements.txt` before installing these separately to avoid unnecessary duplicate installations.
+
+### 4. Git LFS
+
+If the repository uses Git LFS to track large files, install and initialize it.
 
 **macOS:**
 
@@ -139,51 +254,46 @@ git lfs install
 git lfs install
 ```
 
-### 4. HDF4 Support for `pyhdf` on macOS
+### 5. HDF4 Support on macOS
 
-The `pyhdf` package depends on the HDF4 library. On macOS, install HDF4 first:
+The `pyhdf` package requires the HDF4 library. On macOS, install HDF4 first:
 
 ```bash
 brew install hdf4
-```
-
-Then try installing the Python package:
-
-```bash
 pip install pyhdf
 ```
 
-If installation fails, check that the HDF4 headers and libraries are discoverable by your compiler and Python environment. The exact setup may vary by Mac architecture and Python version.
+If installation fails, check that your compiler can locate the HDF4 headers and libraries. The exact configuration may vary by Mac architecture and Python version.
 
-### 5. CPU and GPU Support
+### 6. CPU and GPU Support
 
-The models can be run on a CPU, although training may take longer for large datasets.
+The scripts may run on a CPU, although training can take longer for large datasets.
 
-For NVIDIA GPU acceleration on Linux, install a PyTorch version compatible with your CUDA environment. Follow the official PyTorch installation selector to choose the appropriate command.
+For NVIDIA GPU acceleration, install a PyTorch version compatible with your CUDA environment using the official [PyTorch installation guide](https://pytorch.org/get-started/locally/).
 
-Verify the PyTorch installation:
+Check CUDA availability:
 
 ```bash
 python -c "import torch; print(torch.__version__); print('CUDA available:', torch.cuda.is_available())"
 ```
 
-On supported Apple Silicon Macs, PyTorch may also use the Metal Performance Shaders (MPS) backend. Check availability with:
+On supported Apple Silicon Macs, check whether the PyTorch MPS backend is available:
 
 ```bash
 python -c "import torch; print('MPS available:', torch.backends.mps.is_available())"
 ```
 
-GPU availability depends on the hardware, installed libraries, and whether the training scripts support the selected device.
+GPU support depends on the hardware, installed libraries, and device handling implemented in each training script.
 
 ## NASA Earthdata Authentication
 
-Some satellite datasets may require a NASA Earthdata account and authentication.
+Some satellite-data downloads may require a NASA Earthdata account.
 
-1. Create an account through the [NASA Earthdata Login](https://urs.earthdata.nasa.gov/) website.
-2. Configure your credentials using the authentication method supported by the data-download scripts.
-3. If the scripts use a `.netrc` file, create it in your home directory.
+1. Register at [NASA Earthdata Login](https://urs.earthdata.nasa.gov/).
+2. Configure authentication according to the requirements of the download script.
+3. If the script uses a `.netrc` file, create or edit `~/.netrc` in your home directory.
 
-Example `.netrc` entry:
+Example:
 
 ```text
 machine urs.earthdata.nasa.gov
@@ -191,109 +301,120 @@ login YOUR_EARTHDATA_USERNAME
 password YOUR_EARTHDATA_PASSWORD
 ```
 
-Set restrictive file permissions:
+Set restrictive permissions:
 
 ```bash
 chmod 600 ~/.netrc
 ```
 
-Replace the placeholders with your own credentials. **Never commit `.netrc`, passwords, access tokens, or other secrets to GitHub.** Follow NASA Earthdata's current authentication guidance if a data service requires a different method.
+Replace the placeholders with your own credentials. Never commit `.netrc`, passwords, or access tokens to GitHub. Follow the current NASA Earthdata instructions if a particular service requires a different authentication method.
 
 ## Dataset Preparation
 
-The project uses multiple data sources that may differ in spatial resolution, temporal frequency, coordinate conventions, and file format.
+The repository separates raw data from processed data.
 
-The preparation workflow may include:
+- `data/raw/` is intended for source datasets organized by data source.
+- `data/processed/` contains task-specific prepared datasets.
+- `dataset/` contains general dataset download utilities.
+- `preprocessing/` contains source-specific extraction, matching, label creation, and dataset preparation scripts.
+- `scripts/` contains supporting data-acquisition, verification, matching, and team workflow utilities.
 
-1. Acquiring the required satellite and meteorological data.
-2. Extracting relevant variables and features from the source files.
-3. Processing HDF and NetCDF data as required.
-4. Aligning observations across the required spatial and temporal dimensions.
-5. Preparing cloud-type, cloud-base-height, precipitation, and rainfall-rate targets.
-6. Handling missing or invalid observations.
-7. Saving the integrated dataset in the format expected by the model scripts.
+The general preparation workflow is:
 
-The exact commands and file paths depend on the data-processing scripts available in the repository. Use the paths and options defined in those scripts rather than assuming that every stage can be run with one command.
+1. Acquire the required source data.
+2. Extract relevant observations and variables.
+3. Match observations across the required spatial and temporal dimensions.
+4. Generate labels and prepare task-specific features.
+5. Split datasets into training, validation, and testing subsets where applicable.
+6. Save the processed data in the expected locations.
+7. Verify the resulting files before training.
 
-## Running the Models
+Refer to the README files within the relevant preprocessing directories for additional instructions.
 
-Run the individual scripts for the required task from the repository's working directory.
+## Running Training Scripts
 
-The exact script names and command-line arguments should match the files committed to the repository. Before starting a long training run, check each script for its input paths, configuration parameters, output directory, and device settings.
+Run a training script from the repository root after installing its dependencies and preparing its expected input data.
 
-The four model workflows are:
+For example, the cloud-base-height training script is located at:
 
-- **TabM:** Cloud-type classification
-- **TabM:** Cloud-base-height estimation
-- **Oya-U-Net:** Precipitation detection
-- **Oya-QPE:** Rainfall-rate estimation
+```bash
+python training/cbh/train_cbh_tabnet_mixed_stratified.py
+```
 
-Use the corresponding configuration and preprocessing steps for each task. Do not assume that the same input columns or target format are shared across all models.
+Other training scripts are located at:
 
-## Evaluation Metrics
+```text
+training/cloud_type/08_train_cloudtype_fttransformer.py
+training/precipitation_detection/06_train_precip_tcn.py
+training/rainfall_intensity/14_train_precip_rate_residual_mlp_v2_smote.py
+```
 
-The project evaluates its models using metrics suited to each task.
+Before running a script, inspect its configuration and confirm that the input paths, output paths, required arguments, and device settings match your environment. The command above assumes the script can be launched directly from the repository root without additional command-line arguments.
 
-| Task | Metrics |
-|---|---|
-| Cloud-type classification | Accuracy, macro precision, macro recall, macro F1-score, weighted F1-score |
-| Cloud-base-height estimation | Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), coefficient of determination (R²) |
-| Precipitation detection | Precision, recall / Probability of Detection (POD), F1-score |
-| Rainfall-rate estimation | MAE, RMSE, R² |
+## Evaluation and Results
 
-For classification tasks, macro-averaged metrics help assess performance across classes, while weighted metrics account for class frequencies. For regression tasks, MAE and RMSE measure prediction error, and R² summarizes the variance explained by the model.
+Evaluation artifacts are organized by task in `evaluation/`.
+
+Available artifact types include:
+
+- Cloud-base-height metrics and feature-importance results.
+- Cloud-type classification reports, configuration information, and confusion matrices.
+- Precipitation-detection evaluation CSV files.
+- Rainfall-intensity evaluation CSV files.
+
+The metrics and outputs generated by each evaluation workflow should be interpreted according to that task's target definition and test-data split.
 
 ## Aviation Weather Decision Support
 
-The project aims to combine the model outputs into a broader view of regional weather conditions. Potential decision-support components include regional cloud coverage, changes in weather estimates over time, the duration of potentially hazardous conditions, and rule-based risk indicators.
+The project provides a foundation for combining weather-estimation outputs into a regional picture of atmospheric conditions. Possible extensions include tracking changes over time, calculating regional cloud coverage, assessing the persistence of potentially hazardous conditions, and applying transparent rule-based risk indicators.
 
-Model-explanation techniques such as SHAP may help identify which input features influence predictions. Any risk indicators or reports produced by such a system should be treated as research outputs and validated before operational use.
+Model-explanation techniques such as SHAP may be incorporated to help interpret model predictions. Any decision-support outputs require appropriate validation before they can be considered for operational aviation use.
 
-## Working on an HPC or Remote Linux Server
+## HPC and Remote Linux Execution
 
-For large datasets and computationally intensive training, the workflow can be run on a remote Linux server or high-performance computing (HPC) environment.
+Large datasets and computationally intensive experiments may be run on an institutional high-performance computing (HPC) system.
 
 A typical workflow is:
 
-1. Connect to the authorized server using SSH.
-2. Activate the project's Python environment.
-3. Confirm that the required data files and dependencies are available.
-4. Run preprocessing or training scripts from the appropriate working directory.
-5. Save logs, model checkpoints, and evaluation results.
-6. Verify that the output files were generated successfully.
+1. Connect to the authorized remote server using SSH.
+2. Activate the project environment.
+3. Verify the data paths and installed dependencies.
+4. Run the required preprocessing or training scripts.
+5. Save logs, checkpoints, and evaluation outputs.
+6. Confirm that the jobs completed and the output files are valid.
 
-For long-running experiments, use the job scheduler provided by your institution if required. Avoid starting duplicate training or data-transfer jobs without checking whether an existing job is already running.
+Use the institution's job scheduler where required. For long-running jobs, check whether an existing process is active before starting another copy.
 
 ## Reproducibility
 
 For reproducible experiments:
 
-- Record the Python and package versions used.
-- Document the source datasets and preprocessing settings.
-- Keep training, validation, and test splits consistent.
+- Record Python and package versions.
+- Document source datasets and preprocessing settings.
+- Keep training, validation, and testing splits consistent.
 - Record random seeds where supported.
 - Save model configurations, checkpoints, and evaluation metrics.
-- Document hardware and device settings.
-- Avoid publishing credentials or restricted data.
+- Document the hardware and compute device used.
+- Keep credentials and restricted data out of the repository.
 
-Large datasets may not be appropriate for direct storage in GitHub. Use an approved data repository or other suitable hosting service and provide access instructions where permitted.
+Large datasets may be better hosted in an appropriate data repository rather than directly in GitHub. Follow the applicable data-use and licensing terms.
 
 ## Limitations
 
-- Model performance depends on the quality and representativeness of the reference data.
-- Satellite and reanalysis products may differ in spatial and temporal resolution.
-- Results can be affected by missing observations, class imbalance, and alignment errors.
-- Research-based weather estimates should not be interpreted as certified aviation forecasts.
+- Results depend on the quality and representativeness of the source and reference data.
+- Differences in spatial and temporal resolution can affect data alignment.
+- Missing observations, class imbalance, and preprocessing errors may affect model performance.
+- Research predictions should not be treated as certified aviation forecasts.
 - Operational use would require further validation, uncertainty assessment, and domain-specific review.
 
 ## Acknowledgments
 
-This project uses data and scientific resources from NASA MODIS, ERA5, GPM IMERG, and CALIPSO-related products. Please cite the relevant dataset documentation and research publications when using these data.
+This project uses data and scientific resources associated with NASA MODIS, ERA5, GPM IMERG, and CALIPSO-related products. Please consult and cite the relevant dataset documentation and research publications when using these resources.
 
 ## License
 
-Add the license that applies to this repository and its contents. Make sure that the selected license is compatible with the licenses and terms of use for the datasets and third-party code.
+See the repository's `LICENSE` file for the applicable license. Ensure that the use and redistribution of datasets and third-party software also comply with their respective terms.
 
 ## Contact
 
-For questions, bug reports, or collaboration, please open an issue in the GitHub repository or contact the project maintainers.
+For questions, bug reports, or collaboration, please open an issue in the [GitHub repository](https://github.com/RoshJ-17/VLIL_Group14).
