@@ -1,426 +1,299 @@
-# Enhancing Aviation and Flight Safety Through Near-Real-Time Weather Intelligence
+# A Multisource Satellite-Based Deep Learning Framework for Aviation Weather Monitoring and Decision Support
 
-A satellite-driven machine learning pipeline that processes multi-source remote sensing data over India to produce four weather intelligence outputs useful for aviation safety.
+## Overview
 
-**Data coverage:** 01 July 2022 – 30 June 2023  
-**Region:** India (6°–38°N, 68°–98°E)
+This project develops a multisource satellite-based deep learning framework for aviation weather monitoring over India. It combines satellite observations, meteorological reanalysis data, precipitation products, and cloud-type reference labels to estimate weather conditions that may affect aviation operations.
 
----
+The framework focuses on four key weather-estimation tasks: cloud-type classification, cloud-base-height estimation, precipitation detection, and rainfall-rate estimation. These outputs are intended to support weather monitoring and provide useful information for aviation weather assessment.
 
-## Project Overview
-
-This project fuses four satellite/reanalysis data sources to train four separate ML models:
-
-| Task | Model | Output |
-|---|---|---|
-| Cloud Base Height (CBH) | TabNet | Regression — CBH in metres |
-| Cloud Type Classification | FT-Transformer | 10-class classification |
-| Precipitation Detection | TCN | Binary — rain / no rain |
-| Rainfall Intensity | Residual MLP + SMOTE | Regression — mm/h |
-
----
-
-## Data Sources
-
-### NASA MODIS (Terra satellite)
-- **Products:** `MOD06_L2` (cloud properties) and `MOD021KM` (1 km radiance)
-- **Source:** NASA LAADS DAAC
-- **Extracted fields:** Brightness temperatures (BT_11, BT_12), brightness temperature difference (BTD), Cloud Top Temperature (CTT), Cloud Top Height (CTH), Cloud Mask, Cloud Phase, Cloud Optical Thickness
-- **Geographic filter:** India bounding box — lat 5–35°N, lon 65–100°E
-- **Overpass filter:** India-relevant UTC hours — 03–08 and 15–20
-
-### CALIPSO (CAL_LID_L2_VFM)
-- **Used for:** Cloud type ground truth labels
-- **Extraction:** Feature_Classification_Flags 16-bit field decoded as:
-  - `feature_type = flags & 7` → 2 = cloud
-  - `cloud_subtype = (flags >> 9) & 7` → cloud class 0–7
-- **10 output classes:** clear, liquid_low/middle/high, ice_low/middle/high, undetermined_low/middle/high
-
-### ERA5 (ECMWF Reanalysis v5)
-- **Variable:** `cbh` — Cloud Base Height (metres)
-- **Resolution:** Hourly, 0.25° grid
-- **Used for:** Ground-truth regression target for CBH prediction
-- **Matching:** MODIS pixels matched to ERA5 by nearest-hour rounding and nearest grid-cell index lookup
-
-### GPM (Global Precipitation Measurement)
-- **Used for:** Precipitation detection binary labels and rainfall intensity regression target (`GPM_precipitation_rate` in mm/h)
-- **Matching:** Spatiotemporally joined to MODIS pixels
-
----
-
-## Repository Structure
-
-```
-VLIL_Group14/
-│
-├── dataset/                        # MODIS HDF downloader scripts
-│   ├── download.py                 # Bearer token authentication
-│   ├── noToken.py                  # .netrc authentication
-│   └── optimized.py                # Optimized: geo-check on MOD06 only
-│
-├── extraction/
-│   └── cloud_type.py               # CALIPSO VFM bit-field extraction example
-│
-├── preprocessing/
-│   ├── modis/
-│   │   ├── 01_modis_extraction.py          # Extract pixel-level fields from HDF
-│   │   ├── 02_combine_modis_chunks.py      # Merge chunks into modis_pixel.csv
-│   │   └── README.md
-│   ├── calipso/
-│   │   ├── 05_create_cloud_labels.py       # Decode VFM flags → cloud labels
-│   │   ├── 06_create_cloudtype_final.py    # Align CALIPSO labels to MODIS pixels
-│   │   ├── 07_split_cloudtype_dataset.py   # Train/val/test split
-│   │   └── README.md (see preprocessing/calipso/)
-│   ├── era5/
-│   │   ├── 03_match_era5_cbh.py            # Join MODIS pixels with ERA5 CBH
-│   │   ├── 04_prepare_cbh_v2.py            # Feature engineering + temporal split
-│   │   ├── create_cbh_mixed_day_stratified_split.py   # Stratified resplit
-│   │   └── README.md
-│   └── gpm/
-│       ├── 04_match_gpm_precip.py          # Join MODIS with GPM precipitation
-│       ├── 06_create_precip_labels.py      # Threshold GPM → binary rain label
-│       ├── 08_create_precip_positive_modis_dataset.py  # Filter to rain-positive pixels
-│       ├── 12_create_mixed_day_precip_split.py         # Mixed-day stratified split
-│       └── README.md
-│
-├── training/
-│   ├── cbh/
-│   │   └── train_cbh_tabnet_mixed_stratified.py   # TabNet CBH training
-│   ├── cloud_type/
-│   │   └── 08_train_cloudtype_fttransformer.py    # FT-Transformer cloud type training
-│   ├── precipitation_detection/
-│   │   └── 06_train_precip_tcn.py                 # TCN precipitation detection training
-│   └── rainfall_intensity/
-│       └── 14_train_precip_rate_residual_mlp_v2_smote.py  # Residual MLP + SMOTE training
-│
-├── data/
-│   ├── raw/
-│   │   ├── modis/          # Downloaded MOD06_L2 and MOD021KM HDF files
-│   │   ├── calipso/        # CALIPSO VFM HDF files
-│   │   ├── era5/           # ERA5 NetCDF files
-│   │   └── gpm/            # GPM precipitation files
-│   └── processed/
-│       ├── pixel_level/
-│       │   └── modis_pixel.csv                    # All MODIS pixel features (~2.6M rows)
-│       ├── cbh/
-│       │   ├── cbh_mixed_stratified_train.csv.zip (~686k rows, zipped)
-│       │   ├── cbh_mixed_stratified_val.csv       (~85k rows)
-│       │   └── cbh_mixed_stratified_test.csv      (~85k rows)
-│       ├── cloud_type/
-│       │   ├── cloudtype_train.csv
-│       │   ├── cloudtype_val.csv
-│       │   └── cloudtype_test.csv
-│       ├── precipitation_detection/
-│       │   ├── modis_gpm_precip.csv
-│       │   └── modis_gpm_precip_detection.csv
-│       └── rainfall_intensity/
-│           ├── precip_positive_modis_mixed_train.csv (~99.8k rows)
-│           ├── precip_positive_modis_mixed_val.csv   (~21.4k rows)
-│           └── precip_positive_modis_mixed_test.csv  (~21.4k rows)
-│
-├── models/
-│   ├── cbh/
-│   │   └── cbh_tabnet_mixed_stratified_model.zip
-│   ├── cloud_type/
-│   │   └── best_model.pt
-│   ├── precipitation_detection/
-│   │   └── precipitation_tcn.pt
-│   └── rainfall_intensity/
-│       └── precip_rate_residual_mlp_v2_smote.pt
-│
-├── evaluation/
-│   ├── cbh/
-│   │   ├── cbh_tabnet_mixed_stratified_metrics.json
-│   │   └── cbh_tabnet_mixed_stratified_feature_importance.csv
-│   ├── cloud_type/
-│   │   ├── classification_report.txt
-│   │   ├── confusion_matrix.csv
-│   │   └── config.json
-│   ├── precipitation_detection/
-│   │   ├── precipitation_tcn_threshold_results.csv
-│   │   ├── precipitation_tcn_fine_threshold_results.csv
-│   │   └── precipitation_tcn_test_predictions.csv
-│   └── rainfall_intensity/
-│       ├── precip_rate_residual_mlp_v2_smote_intensity_evaluation.csv
-│       └── precip_rate_residual_mlp_v2_smote_test_predictions.csv
-│
-├── docs/
-│   ├── architecture/
-│   ├── methodology/
-│   └── results/
-│
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Pipeline
-
-### Step 1 — Download MODIS Data (`dataset/`)
-
-Three downloader variants are provided. All share the same logic:
-
-1. Scrape the [NASA LAADS DAAC](https://ladsweb.modaps.eosdis.nasa.gov) HTML listing for `.hdf` URLs per day
-2. Match `MOD06_L2` and `MOD021KM` files by their embedded timestamp (year + DOY + HHMM)
-3. Filter to India overpass hours (03–08 UTC and 15–20 UTC)
-4. Download to `.tmp`, verify India geographic coverage, rename or delete
-
-**Which script to use:**
-
-| Script | Auth method | Notes |
-|---|---|---|
-| `download.py` | Bearer token in header | Set `TOKEN` variable |
-| `noToken.py` | `~/.netrc` (NASA Earthdata) | Most convenient |
-| `optimized.py` | `~/.netrc` | Skips MOD021KM download if MOD06 fails India geo-check — saves bandwidth |
-
-For NASA Earthdata credentials, register at [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov) and add to `~/.netrc`:
-```
-machine urs.earthdata.nasa.gov login <username> password <password>
-```
-
-### Step 2 — MODIS Extraction (`preprocessing/modis/`)
-
-- `01_modis_extraction.py` — reads each HDF pair, extracts per-pixel fields, saves chunked CSVs
-- `02_combine_modis_chunks.py` — merges all chunks into `data/processed/pixel_level/modis_pixel.csv`
-
-Output columns: `timestamp, lat, lon, BT_11, BT_12, BTD, CTT, CTH, Cloud_Mask_Raw, Cloud_Mask_Binary, Cloud_Phase, Cloud_Optical_Thickness`
-
-### Step 3 — CALIPSO Extraction (`extraction/`, `preprocessing/calipso/`)
-
-The core bit-field decoding logic is demonstrated in `extraction/cloud_type.py`:
-```python
-feature_type  = flags & 7          # bits 0-2 → 2 = cloud
-cloud_subtype = (flags >> 9) & 7   # bits 9-11 → 0-7 cloud type
-```
-
-The pipeline scripts (`05`, `06`, `07`) process all CALIPSO VFM files, align them to MODIS pixels spatiotemporally, and produce the cloud type labelled dataset.
-
-### Step 4 — ERA5 Matching (`preprocessing/era5/`)
-
-**`03_match_era5_cbh.py`**
-- Loads ERA5 NetCDF (`cbh` variable)
-- Processes `modis_pixel.csv` in 250,000-row chunks
-- Rounds MODIS timestamp to nearest ERA5 hour
-- Computes grid indices: `round((value - origin) / step)`, clipped to bounds
-- Direct array lookup: `cbh[time_idx, lat_idx, lon_idx]`
-- Outputs `modis_era5_cbh.csv`
-
-**`04_prepare_cbh_v2.py`**
-- Filters: valid ERA5_CBH, cloudy pixels only (`Cloud_Mask_Binary == 1`), non-null CTT/CTH/Cloud_Phase
-- Derives time features: `hour` (float), `day_of_year`
-- Encodes Cloud Phase: `{0→0 (clear), 1→1 (liquid), 2→2 (ice), 6→3 (undetermined)}`
-- Target transformation: `target_log_cbh = log1p(ERA5_CBH)`
-- Temporal split by date: Train = Nov 19–22, Val = Nov 23, Test = Nov 24, 2022
-- Fits `StandardScaler` on train only; transforms val/test
-
-**`create_cbh_mixed_day_stratified_split.py`**
-- Recombines all 3 splits
-- Stratifies by compound label: `date + CBH range bin` (7 bins: 0–250m, 250–500m, 500m–1km, 1–2km, 2–5km, 5–10km, >10km)
-- Two-stage split: 80% train / 10% val / 10% test
-- Outputs `cbh_mixed_stratified_{train,val,test}.csv`
-
-### Step 5 — GPM Matching (`preprocessing/gpm/`)
-
-- `04_match_gpm_precip.py` — spatiotemporal join of MODIS pixels with GPM precipitation rates
-- `06_create_precip_labels.py` — thresholds GPM rate → binary `precipitation_flag`
-- `08_create_precip_positive_modis_dataset.py` — filters to precipitation-positive pixels only (for intensity model)
-- `12_create_mixed_day_precip_split.py` — mixed-day stratified split
-
-### Step 6 — Model Training (`training/`)
-
-#### Cloud Base Height — TabNet (`train_cbh_tabnet_mixed_stratified.py`)
-
-- **Features (9):** BT_11, BT_12, BTD, lat, lon, CTT, CTH, Cloud_Mask_Raw, Cloud_Phase
-- **Target:** `ERA5_CBH` (metres, raw)
-- **Architecture:** TabNet with attention masking (`entmax`)
-  - `n_d=32, n_a=32, n_steps=5, gamma=1.5`
-  - `n_independent=2, n_shared=2, lambda_sparse=1e-4`
-- **Training:** Adam lr=0.02, batch=8192, virtual_batch=1024, max_epochs=200, patience=20
-- **Outputs:** model `.zip`, test predictions, metrics JSON, feature importance CSV, per-range error analysis
-
-Run:
-```bash
-python training/cbh/train_cbh_tabnet_mixed_stratified.py
-```
-
-#### Cloud Type — FT-Transformer (`08_train_cloudtype_fttransformer.py`)
-
-- **Two modes:**
-  - `base` — 7 MODIS features (lat, lon, BT_11, BT_12, BTD, Cloud_Mask_Binary, Cloud_Mask_Raw)
-  - `extended` — base + CTH + CTT + Cloud_Phase (categorical)
-- **Target:** 10-class cloud type label
-- **Architecture:** FT-Transformer (`tab-transformer-pytorch`)
-  - `dim=64, depth=4, heads=8, dim_head=16, attn_dropout=0.1, ff_dropout=0.1`
-- **Training:** AdamW lr=1e-4, ReduceLROnPlateau, batch=4096, max_epochs=30, patience=5
-- **Class imbalance:** Balanced class weights (capped at 10×), applied to CrossEntropyLoss
-- **Best model:** saved by validation macro-F1
-- **Outputs:** `best_model.pt`, `classification_report.txt`, `confusion_matrix.csv`, `config.json`, `training_history.csv`
-
-Run:
-```bash
-python training/cloud_type/08_train_cloudtype_fttransformer.py --mode extended
-```
-
-#### Precipitation Detection — TCN (`06_train_precip_tcn.py`)
-
-- **Features (11):** lat, lon, BT_11, BT_12, BTD, Cloud_Mask_Binary, Cloud_Mask_Raw, CTT, CTH, Cloud_Phase, Cloud_Optical_Thickness
-- **Target:** `precipitation_flag` (binary 0/1)
-- **Architecture:** Temporal Convolutional Network
-  - 3 dilated residual blocks, channels `(64, 64, 128)`, kernel_size=3, dilation `2^i`
-  - Causal convolutions via `Chomp1d`, residual connections
-  - Sequence length: 12 consecutive observations
-- **Training:** AdamW lr=1e-3, BCEWithLogitsLoss with positive class weight, max_epochs=30
-- **Class imbalance:** `pos_weight = n_negative / n_positive` passed to BCE loss
-- **Best model:** saved by validation F1
-- **Outputs:** `precipitation_tcn.pt`, test predictions CSV
-
-Run:
-```bash
-python training/precipitation_detection/06_train_precip_tcn.py
-```
-
-#### Rainfall Intensity — Residual MLP + SMOTE (`14_train_precip_rate_residual_mlp_v2_smote.py`)
-
-- **Features (10):** lat, lon, BT_11, BT_12, BTD, Cloud_Mask_Binary, Cloud_Mask_Raw, CTT, CTH, Cloud_Phase
-- **Target:** `GPM_precipitation_rate` (mm/h, positive-only pixels)
-- **Architecture:** Residual MLP with dual-head output
-  - Input layer → 5 residual blocks (Linear + BatchNorm + ReLU + Dropout, dim=256)
-  - **Regression head:** predicts `log1p(precipitation_rate)`
-  - **Classification head:** predicts intensity bin (5 classes: <1, 1–5, 5–10, 10–20, >20 mm/h)
-- **Loss:** Intensity-weighted Huber loss (log1p space) + 0.2 × auxiliary cross-entropy classification loss
-- **Class imbalance:** Custom SMOTE oversampling applied only to training data
-  - Synthetic samples generated by feature-space interpolation between k-nearest neighbours
-  - Precipitation rate also interpolated in log1p space for consistency
-  - Target synthetic counts: {<1: 67274, 1–5: 26781, 5–10: 8000, 10–20: 4000, >20: 1600}
-- **Training:** AdamW lr=5e-4, ReduceLROnPlateau, batch=2048, max_epochs=100, patience=15
-- **Outputs:** `precip_rate_residual_mlp_v2_smote.pt`, test predictions CSV, intensity evaluation CSV
-
-Run:
-```bash
-python training/rainfall_intensity/14_train_precip_rate_residual_mlp_v2_smote.py
-```
-
----
+**Study region:** India  
+**Study period:** July 1, 2022, to June 30, 2023
 
 ## Features Summary
 
-| Feature | Description | Used in |
-|---|---|---|
-| `BT_11` | 11 µm brightness temperature | All models |
-| `BT_12` | 12 µm brightness temperature | All models |
-| `BTD` | BT_11 – BT_12 split-window difference | All models |
-| `CTT` | Cloud Top Temperature | CBH, Cloud Type, Precip |
-| `CTH` | Cloud Top Height | CBH, Cloud Type, Precip |
-| `Cloud_Mask_Binary` | 0 = clear, 1 = cloudy | All models |
-| `Cloud_Mask_Raw` | Raw mask confidence value | CBH, Cloud Type |
-| `Cloud_Phase` | 1=liquid, 2=ice, 3=undetermined | All models |
-| `Cloud_Optical_Thickness` | COT | Precipitation Detection |
-| `lat`, `lon` | Pixel geolocation | All models |
-| `hour`, `day_of_year` | Time-of-day and seasonal features | CBH |
+### 1. Multisource Weather Data Integration
+- Integrates data from multiple meteorological and satellite sources.
+- Uses MODIS observations, ERA5 reanalysis data, GPM IMERG precipitation products, and CALIPSO-derived cloud-type labels.
+- Supports the development of a unified dataset for multiple weather-estimation tasks.
 
----
+### 2. Cloud Detection and Cloud Coverage Estimation
+- Supports cloud identification using available satellite-derived features.
+- Calculates cloud coverage from the available cloud-related data and classifications.
+- Provides regional cloud information that can complement the individual weather-estimation outputs.
 
-## Setup
+### 3. Cloud-Type Classification
+- Uses the **TabM** deep learning model to classify cloud types.
+- Uses CALIPSO-derived labels as reference targets for model development and evaluation.
+- Helps characterize cloud conditions relevant to weather monitoring.
 
-### Requirements
+### 4. Cloud-Base-Height Estimation
+- Uses **TabM** to estimate cloud-base height.
+- Uses ERA5 cloud-base-height data as the reference for model training and evaluation.
+- Produces continuous height estimates for analyzing cloud conditions.
+
+### 5. Precipitation Detection
+- Uses **Oya-U-Net** for precipitation detection.
+- Formulates precipitation detection as a binary classification task using labels derived from GPM IMERG data.
+- Identifies whether precipitation is present in the evaluated samples.
+
+### 6. Rainfall-Rate Estimation
+- Uses **Oya-QPE** to estimate rainfall rate.
+- Uses GPM IMERG precipitation data as the reference source.
+- Treats rainfall-rate estimation as a regression task to quantify precipitation intensity.
+
+### 7. Aviation Weather Decision Support
+- Brings together cloud, cloud-base-height, precipitation, and rainfall-rate estimates.
+- Provides a foundation for assessing weather conditions that may be relevant to aviation.
+- Supports the planned integration of regional cloud coverage, temporal weather trends, hazard persistence, and rule-based risk assessment.
+- Can be extended with model-explanation methods such as SHAP to help interpret predictions.
+
+> The framework is intended for research and decision-support development. It is not a certified aviation weather forecasting or operational air-traffic-control system.
+
+## Data Sources
+
+The project uses the following data sources:
+
+| Data source | Purpose |
+|---|---|
+| MODIS MOD06_L2 | Cloud-related observations and products |
+| MODIS MOD021KM | Moderate Resolution Imaging Spectroradiometer Level-1B radiance observations |
+| ERA5 | Meteorological reanalysis data, including cloud-base height |
+| GPM IMERG | Precipitation information used for precipitation detection and rainfall-rate estimation |
+| CALIPSO-derived labels | Reference labels for cloud-type classification |
+
+The availability, spatial and temporal alignment, and quality of the source data affect the final integrated dataset and model performance.
+
+## Models and Estimation Tasks
+
+| Task | Model | Reference data | Task type |
+|---|---|---|---|
+| Cloud-type classification | TabM | CALIPSO-derived cloud-type labels | Classification |
+| Cloud-base-height estimation | TabM | ERA5 cloud-base height | Regression |
+| Precipitation detection | Oya-U-Net | GPM IMERG-derived precipitation labels | Binary classification |
+| Rainfall-rate estimation | Oya-QPE | GPM IMERG rainfall rate | Regression |
+
+## Installation and Setup
+
+### Prerequisites
+
+- Python 3.10 or a version compatible with the project's dependencies
+- Git
+- `pip`
+- Git Large File Storage (Git LFS), if the repository uses it
+- A compatible operating system: macOS or Linux
+- Optional GPU support for accelerated training
+
+Clone the repository and move into its directory:
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd <YOUR_REPOSITORY_NAME>
+```
+
+Replace the placeholders with your actual GitHub repository URL and repository directory name.
+
+### 1. Create a Virtual Environment
+
+On macOS or Linux:
+
+```bash
+python3 -m venv aviation
+source aviation/bin/activate
+```
+
+Upgrade the package installer:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+### 2. Install the Requirements
+
+If the repository contains a `requirements.txt` file, install its dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-`requirements.txt` covers the core stack. Additional packages needed:
+### 3. Install Additional Packages
+
+Depending on which scripts you run, the project may require the following packages:
 
 ```bash
-pip install pyhdf           # HDF4 reading (MODIS + CALIPSO)
-pip install beautifulsoup4  # HTML scraping for LAADS DAAC downloader
-pip install xarray netCDF4  # ERA5 NetCDF reading
-pip install joblib          # Scaler serialization
-pip install pytorch-tabnet  # TabNet model
-pip install tab-transformer-pytorch  # FT-Transformer model
-pip install imbalanced-learn         # SMOTE (sklearn-compatible)
-pip install git-lfs                  # Required to pull large data files
+pip install pyhdf beautifulsoup4 xarray netCDF4 joblib
+pip install pytorch-tabnet tab-transformer-pytorch imbalanced-learn
 ```
 
-For HDF4 support on macOS, install the HDF4 C library first:
-```bash
-brew install hdf4
-pip install pyhdf
-```
+Install Git LFS if it is used to track files in the repository.
 
-### GPU / CPU
-
-All training scripts auto-detect CUDA. On CPU they run correctly but will be significantly slower, especially for cloud type (FT-Transformer) and CBH (TabNet) which have large datasets (~600k+ rows).
-
-### NASA Earthdata Access
-
-Data download requires a free NASA Earthdata account. Configure credentials in `~/.netrc`:
-```
-machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD
-```
-
----
-
-## Running the Full Pipeline
-
-Run scripts in numbered order:
+**macOS:**
 
 ```bash
-# 1. Download MODIS HDF files
-python dataset/optimized.py
-
-# 2. Extract pixel-level features
-python preprocessing/modis/01_modis_extraction.py
-python preprocessing/modis/02_combine_modis_chunks.py
-
-# 3. Match with ERA5 and prepare CBH dataset
-python preprocessing/era5/03_match_era5_cbh.py
-python preprocessing/era5/04_prepare_cbh_v2.py
-python preprocessing/era5/create_cbh_mixed_day_stratified_split.py
-
-# 4. CALIPSO cloud type labels
-python preprocessing/calipso/05_create_cloud_labels.py
-python preprocessing/calipso/06_create_cloudtype_final.py
-python preprocessing/calipso/07_split_cloudtype_dataset.py
-
-# 5. GPM precipitation matching and labelling
-python preprocessing/gpm/04_match_gpm_precip.py
-python preprocessing/gpm/06_create_precip_labels.py
-python preprocessing/gpm/08_create_precip_positive_modis_dataset.py
-python preprocessing/gpm/12_create_mixed_day_precip_split.py
-
-# 6. Train models
-python training/cbh/train_cbh_tabnet_mixed_stratified.py
-python training/cloud_type/08_train_cloudtype_fttransformer.py --mode extended
-python training/precipitation_detection/06_train_precip_tcn.py
-python training/rainfall_intensity/14_train_precip_rate_residual_mlp_v2_smote.py
+brew install git-lfs
+git lfs install
 ```
 
----
-
-## Notes on Large Files
-
-`data/processed/pixel_level/modis_pixel.csv` is ~181 MB and exceeds GitHub's 100 MB file size limit. It is tracked via **Git LFS**. To pull it after cloning:
+**Linux:** Install Git LFS using the package manager or installation instructions for your distribution, then run:
 
 ```bash
 git lfs install
-git lfs pull
 ```
 
-The CBH training split (`cbh_mixed_stratified_train.csv.zip`) is stored as a zip archive (~51 MB compressed). Unzip before training:
+### 4. HDF4 Support for `pyhdf` on macOS
+
+The `pyhdf` package depends on the HDF4 library. On macOS, install HDF4 first:
+
 ```bash
-unzip data/processed/cbh/cbh_mixed_stratified_train.csv.zip -d data/processed/cbh/
+brew install hdf4
 ```
 
----
+Then try installing the Python package:
 
-## Evaluation Outputs
+```bash
+pip install pyhdf
+```
+
+If installation fails, check that the HDF4 headers and libraries are discoverable by your compiler and Python environment. The exact setup may vary by Mac architecture and Python version.
+
+### 5. CPU and GPU Support
+
+The models can be run on a CPU, although training may take longer for large datasets.
+
+For NVIDIA GPU acceleration on Linux, install a PyTorch version compatible with your CUDA environment. Follow the official PyTorch installation selector to choose the appropriate command.
+
+Verify the PyTorch installation:
+
+```bash
+python -c "import torch; print(torch.__version__); print('CUDA available:', torch.cuda.is_available())"
+```
+
+On supported Apple Silicon Macs, PyTorch may also use the Metal Performance Shaders (MPS) backend. Check availability with:
+
+```bash
+python -c "import torch; print('MPS available:', torch.backends.mps.is_available())"
+```
+
+GPU availability depends on the hardware, installed libraries, and whether the training scripts support the selected device.
+
+## NASA Earthdata Authentication
+
+Some satellite datasets may require a NASA Earthdata account and authentication.
+
+1. Create an account through the [NASA Earthdata Login](https://urs.earthdata.nasa.gov/) website.
+2. Configure your credentials using the authentication method supported by the data-download scripts.
+3. If the scripts use a `.netrc` file, create it in your home directory.
+
+Example `.netrc` entry:
+
+```text
+machine urs.earthdata.nasa.gov
+login YOUR_EARTHDATA_USERNAME
+password YOUR_EARTHDATA_PASSWORD
+```
+
+Set restrictive file permissions:
+
+```bash
+chmod 600 ~/.netrc
+```
+
+Replace the placeholders with your own credentials. **Never commit `.netrc`, passwords, access tokens, or other secrets to GitHub.** Follow NASA Earthdata's current authentication guidance if a data service requires a different method.
+
+## Dataset Preparation
+
+The project uses multiple data sources that may differ in spatial resolution, temporal frequency, coordinate conventions, and file format.
+
+The preparation workflow may include:
+
+1. Acquiring the required satellite and meteorological data.
+2. Extracting relevant variables and features from the source files.
+3. Processing HDF and NetCDF data as required.
+4. Aligning observations across the required spatial and temporal dimensions.
+5. Preparing cloud-type, cloud-base-height, precipitation, and rainfall-rate targets.
+6. Handling missing or invalid observations.
+7. Saving the integrated dataset in the format expected by the model scripts.
+
+The exact commands and file paths depend on the data-processing scripts available in the repository. Use the paths and options defined in those scripts rather than assuming that every stage can be run with one command.
+
+## Running the Models
+
+Run the individual scripts for the required task from the repository's working directory.
+
+The exact script names and command-line arguments should match the files committed to the repository. Before starting a long training run, check each script for its input paths, configuration parameters, output directory, and device settings.
+
+The four model workflows are:
+
+- **TabM:** Cloud-type classification
+- **TabM:** Cloud-base-height estimation
+- **Oya-U-Net:** Precipitation detection
+- **Oya-QPE:** Rainfall-rate estimation
+
+Use the corresponding configuration and preprocessing steps for each task. Do not assume that the same input columns or target format are shared across all models.
+
+## Evaluation Metrics
+
+The project evaluates its models using metrics suited to each task.
 
 | Task | Metrics |
 |---|---|
-| CBH | MAE, RMSE, R², Bias — overall and per CBH range bin |
-| Cloud Type | Precision, Recall, F1 per class; Balanced Accuracy; Confusion Matrix |
-| Precipitation Detection | Accuracy, Precision, Recall, F1, ROC-AUC, PR-AUC; threshold sweep results |
-| Rainfall Intensity | MAE, RMSE, R², Correlation, Bias — overall and per intensity bin (<1, 1–5, 5–10, 10–20, >20 mm/h) |
+| Cloud-type classification | Accuracy, macro precision, macro recall, macro F1-score, weighted F1-score |
+| Cloud-base-height estimation | Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), coefficient of determination (R²) |
+| Precipitation detection | Precision, recall / Probability of Detection (POD), F1-score |
+| Rainfall-rate estimation | MAE, RMSE, R² |
 
-All evaluation outputs are saved under `evaluation/`.
+For classification tasks, macro-averaged metrics help assess performance across classes, while weighted metrics account for class frequencies. For regression tasks, MAE and RMSE measure prediction error, and R² summarizes the variance explained by the model.
+
+## Aviation Weather Decision Support
+
+The project aims to combine the model outputs into a broader view of regional weather conditions. Potential decision-support components include regional cloud coverage, changes in weather estimates over time, the duration of potentially hazardous conditions, and rule-based risk indicators.
+
+Model-explanation techniques such as SHAP may help identify which input features influence predictions. Any risk indicators or reports produced by such a system should be treated as research outputs and validated before operational use.
+
+## Working on an HPC or Remote Linux Server
+
+For large datasets and computationally intensive training, the workflow can be run on a remote Linux server or high-performance computing (HPC) environment.
+
+A typical workflow is:
+
+1. Connect to the authorized server using SSH.
+2. Activate the project's Python environment.
+3. Confirm that the required data files and dependencies are available.
+4. Run preprocessing or training scripts from the appropriate working directory.
+5. Save logs, model checkpoints, and evaluation results.
+6. Verify that the output files were generated successfully.
+
+For long-running experiments, use the job scheduler provided by your institution if required. Avoid starting duplicate training or data-transfer jobs without checking whether an existing job is already running.
+
+## Reproducibility
+
+For reproducible experiments:
+
+- Record the Python and package versions used.
+- Document the source datasets and preprocessing settings.
+- Keep training, validation, and test splits consistent.
+- Record random seeds where supported.
+- Save model configurations, checkpoints, and evaluation metrics.
+- Document hardware and device settings.
+- Avoid publishing credentials or restricted data.
+
+Large datasets may not be appropriate for direct storage in GitHub. Use an approved data repository or other suitable hosting service and provide access instructions where permitted.
+
+## Limitations
+
+- Model performance depends on the quality and representativeness of the reference data.
+- Satellite and reanalysis products may differ in spatial and temporal resolution.
+- Results can be affected by missing observations, class imbalance, and alignment errors.
+- Research-based weather estimates should not be interpreted as certified aviation forecasts.
+- Operational use would require further validation, uncertainty assessment, and domain-specific review.
+
+## Acknowledgments
+
+This project uses data and scientific resources from NASA MODIS, ERA5, GPM IMERG, and CALIPSO-related products. Please cite the relevant dataset documentation and research publications when using these data.
+
+## License
+
+Add the license that applies to this repository and its contents. Make sure that the selected license is compatible with the licenses and terms of use for the datasets and third-party code.
+
+## Contact
+
+For questions, bug reports, or collaboration, please open an issue in the GitHub repository or contact the project maintainers.
