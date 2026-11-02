@@ -3,17 +3,78 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# C extensions
+*.so
+
 # Environments
 .env
 .venv
+.venv*/
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
 
-# OS metadata
+# macOS / OS metadata
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Large datasets (uncomment if local)
-# data/raw/*
-# !data/raw/.gitkeep
+# Jupyter / IPython
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs and temporary files
+*.log
+*.bak
+*.tmp
+
+# Satellite raw & large scientific data formats
+*.hdf
+*.h5
+*.nc
+*.nc4
+*.tif
+*.tiff
+*.grb
+*.grb2
+*.grib
+*.grib2
+
+# Large model checkpoint formats
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.bin
+
+# Ignore heavy directories inside aviation_weather_project
+aviation_weather_project/.venv/
+aviation_weather_project/data/
+aviation_weather_project/eda_results/
+aviation_weather_project/tabm_cbh_output/
+aviation_weather_project/tabm_full_data/
+aviation_weather_project/tabm_full_w1_run/
+aviation_weather_project/tabm_regression_data/
+aviation_weather_project/tabm_regression_weighted_run/
+
+# Allow aviation UI files to be tracked
+!aviation_weather_project/aviation_ui_review/
+!aviation_weather_project/aviation_ui_review/**
+
+# Ignore pycache, backups, and OS metadata inside UI review
+aviation_weather_project/aviation_ui_review/__pycache__/
+aviation_weather_project/aviation_ui_review/*.bak
+aviation_weather_project/aviation_ui_review/.DS_Store
