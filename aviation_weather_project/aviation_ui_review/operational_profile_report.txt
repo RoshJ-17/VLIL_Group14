@@ -1,0 +1,276 @@
+UNIFIED OPERATIONAL PROFILE
+======================================================================
+Batch ID: real_modis_2023015_v2
+
+1. DATA OVERVIEW
+----------------------------------------------------------------------
+Total pixels processed: 427,597
+Grid/time groups: 26,715
+Timestamps: 10
+
+2. ADVISORY LEVEL DISTRIBUTION
+----------------------------------------------------------------------
+Low: 363,493 pixels
+Moderate: 63,984 pixels
+High: 120 pixels
+
+3. GRID DATA STATUS
+----------------------------------------------------------------------
+Assessable: 20,937 grid/time groups
+Insufficient_Data: 5,778 grid/time groups
+
+4. RECOMMENDATIONS
+----------------------------------------------------------------------
+Unified profile containing two distinct perspectives.
+
+AVIATION-SPECIFIC RECOMMENDATIONS
+  [363,064 pixels] No low-CBH or precipitation trigger was identified. Continue using current official weather reports and applicable minima.
+  [60,447 pixels] Review current aerodrome weather reports, visibility/ceiling observations, and applicable procedures for: low cloud-base.
+  [3,537 pixels] Review current aerodrome weather reports, visibility/ceiling observations, and applicable procedures for: precipitation.
+  [429 pixels] No low-CBH or precipitation trigger was identified. Continue using current official weather reports and applicable minima. CBH estimate unavailable.
+  [115 pixels] Review current aerodrome weather reports, visibility/ceiling observations, and applicable procedures for: precipitation, heavy precipitation.
+  [5 pixels] Review current aerodrome weather reports, visibility/ceiling observations, and applicable procedures for: low cloud-base, precipitation.
+
+MILITARY-SPECIFIC RECOMMENDATIONS
+  [363,064 pixels] No low-CBH or precipitation trigger was identified. Continue mission-specific meteorological assessment.
+  [60,447 pixels] Review local cloud-base and precipitation conditions against mission-specific operating limits for: low cloud-base.
+  [3,537 pixels] Review local cloud-base and precipitation conditions against mission-specific operating limits for: precipitation.
+  [429 pixels] No low-CBH or precipitation trigger was identified. Continue mission-specific meteorological assessment. CBH estimate unavailable.
+  [115 pixels] Review local cloud-base and precipitation conditions against mission-specific operating limits for: precipitation, heavy precipitation.
+  [5 pixels] Review local cloud-base and precipitation conditions against mission-specific operating limits for: low cloud-base, precipitation.
+
+5. TIMESTAMP-WISE WEATHER SUMMARY
+----------------------------------------------------------------------
+
+Timestamp: 2023-01-15 03:35:00
+  Total pixels: 7820
+  Assessable pixels: 7820
+  Low advisory pixels: 7817
+  Moderate advisory pixels: 3
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 0
+  Heavy rain pixels: 0
+  Mean detected rain rate: None mm/hr
+  Maximum detected rain rate: None mm/hr
+
+Timestamp: 2023-01-15 03:40:00
+  Total pixels: 32008
+  Assessable pixels: 32008
+  Low advisory pixels: 23031
+  Moderate advisory pixels: 8977
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 0
+  Heavy rain pixels: 0
+  Mean detected rain rate: None mm/hr
+  Maximum detected rain rate: None mm/hr
+
+Timestamp: 2023-01-15 03:45:00
+  Total pixels: 9963
+  Assessable pixels: 9963
+  Low advisory pixels: 9255
+  Moderate advisory pixels: 706
+  High advisory pixels: 2
+  Assessable coverage: 100.0%
+  Rain detected pixels: 49
+  Heavy rain pixels: 0
+  Mean detected rain rate: 0.6488338626530612 mm/hr
+  Maximum detected rain rate: 1.4288146 mm/hr
+
+Timestamp: 2023-01-15 05:15:00
+  Total pixels: 84900
+  Assessable pixels: 84900
+  Low advisory pixels: 79546
+  Moderate advisory pixels: 5354
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 0
+  Heavy rain pixels: 0
+  Mean detected rain rate: None mm/hr
+  Maximum detected rain rate: None mm/hr
+
+Timestamp: 2023-01-15 05:20:00
+  Total pixels: 88325
+  Assessable pixels: 88325
+  Low advisory pixels: 68558
+  Moderate advisory pixels: 19767
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 122
+  Heavy rain pixels: 0
+  Mean detected rain rate: 1.9103473086065568 mm/hr
+  Maximum detected rain rate: 3.6026735 mm/hr
+
+Timestamp: 2023-01-15 06:50:00
+  Total pixels: 32
+  Assessable pixels: 32
+  Low advisory pixels: 21
+  Moderate advisory pixels: 11
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 0
+  Heavy rain pixels: 0
+  Mean detected rain rate: None mm/hr
+  Maximum detected rain rate: None mm/hr
+
+Timestamp: 2023-01-15 16:10:00
+  Total pixels: 106178
+  Assessable pixels: 106178
+  Low advisory pixels: 88063
+  Moderate advisory pixels: 17997
+  High advisory pixels: 118
+  Assessable coverage: 100.0%
+  Rain detected pixels: 2001
+  Heavy rain pixels: 115
+  Mean detected rain rate: 2.312490670509745 mm/hr
+  Maximum detected rain rate: 6.5957894 mm/hr
+
+Timestamp: 2023-01-15 16:15:00
+  Total pixels: 76340
+  Assessable pixels: 76340
+  Low advisory pixels: 73030
+  Moderate advisory pixels: 3310
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 1302
+  Heavy rain pixels: 0
+  Mean detected rain rate: 1.2143170675883257 mm/hr
+  Maximum detected rain rate: 3.4640768 mm/hr
+
+Timestamp: 2023-01-15 17:45:00
+  Total pixels: 8086
+  Assessable pixels: 8086
+  Low advisory pixels: 3743
+  Moderate advisory pixels: 4343
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 183
+  Heavy rain pixels: 0
+  Mean detected rain rate: 1.0835832918032786 mm/hr
+  Maximum detected rain rate: 2.2981045 mm/hr
+
+Timestamp: 2023-01-15 17:50:00
+  Total pixels: 13945
+  Assessable pixels: 13945
+  Low advisory pixels: 10429
+  Moderate advisory pixels: 3516
+  High advisory pixels: 0
+  Assessable coverage: 100.0%
+  Rain detected pixels: 0
+  Heavy rain pixels: 0
+  Mean detected rain rate: None mm/hr
+  Maximum detected rain rate: None mm/hr
+
+6. GRID-LEVEL SUMMARY
+----------------------------------------------------------------------
+Total grid/time groups: 26,715
+Total assessable pixels across grid/time groups: 427,597
+High advisory pixels across grid/time groups: 120
+
+7. TEMPORAL ANALYSIS OVERVIEW
+----------------------------------------------------------------------
+Grid/time records: 26715
+Assessable grid/time records: 20937
+Grid cells spanning analysis window: 6969
+Trend window: 15 minutes
+Grid size: 0.25 degrees
+Low-CBH reference: 1.5 km
+Rain probability threshold: 0.33
+
+8. TEMPORAL EVENT SUMMARY
+----------------------------------------------------------------------
+CBH_FALLING: 3
+CBH_RISING: 1
+
+9. DETECTED TEMPORAL EVENTS
+----------------------------------------------------------------------
+
+Event: CBH_FALLING
+Timestamp: 2023-01-15 03:45:00
+Grid location: 9.375, 95.375
+Previous CBH: 10.0839267 km
+Current CBH: 10.066586433333333 km
+CBH change: -0.0173402666666699 km
+Previous rain pixels: 0
+Current rain pixels: 0
+Previous mean rain rate: None mm/hr
+Current mean rain rate: None mm/hr
+
+Event: CBH_RISING
+Timestamp: 2023-01-15 03:45:00
+Grid location: 9.375, 95.625
+Previous CBH: 10.123970678571428 km
+Current CBH: 10.319468857142857 km
+CBH change: 0.1954981785714284 km
+Previous rain pixels: 0
+Current rain pixels: 0
+Previous mean rain rate: None mm/hr
+Current mean rain rate: None mm/hr
+
+Event: CBH_FALLING
+Timestamp: 2023-01-15 03:45:00
+Grid location: 9.375, 95.875
+Previous CBH: 10.311783852941176 km
+Current CBH: 10.28590495 km
+CBH change: -0.0258789029411765 km
+Previous rain pixels: 0
+Current rain pixels: 0
+Previous mean rain rate: None mm/hr
+Current mean rain rate: None mm/hr
+
+Event: CBH_FALLING
+Timestamp: 2023-01-15 16:15:00
+Grid location: 25.125, 89.625
+Previous CBH: 1.5506665599999998 km
+Current CBH: 1.5062882 km
+CBH change: -0.0443783599999998 km
+Previous rain pixels: 0
+Current rain pixels: 0
+Previous mean rain rate: None mm/hr
+Current mean rain rate: None mm/hr
+
+10. AVIATION TEMPORAL RECOMMENDATIONS
+----------------------------------------------------------------------
+
+2023-01-15 03:45:00 | CBH_FALLING | Grid: 9.375, 95.375
+Recommendation: Cloud-base height is falling across successive observations. Review current ceiling reports, aerodrome minima, and applicable procedures.
+
+2023-01-15 03:45:00 | CBH_RISING | Grid: 9.375, 95.625
+Recommendation: No defined temporal deterioration event was identified in the available observations. Continue using current official weather reports and applicable minima.
+
+2023-01-15 03:45:00 | CBH_FALLING | Grid: 9.375, 95.875
+Recommendation: Cloud-base height is falling across successive observations. Review current ceiling reports, aerodrome minima, and applicable procedures.
+
+2023-01-15 16:15:00 | CBH_FALLING | Grid: 25.125, 89.625
+Recommendation: Cloud-base height is falling across successive observations. Review current ceiling reports, aerodrome minima, and applicable procedures.
+
+11. MILITARY TEMPORAL RECOMMENDATIONS
+----------------------------------------------------------------------
+
+2023-01-15 03:45:00 | CBH_FALLING | Grid: 9.375, 95.375
+Recommendation: Cloud-base height is falling across successive observations. Review local cloud-base conditions against mission-specific operating limits.
+
+2023-01-15 03:45:00 | CBH_RISING | Grid: 9.375, 95.625
+Recommendation: No defined temporal deterioration event was identified in the available observations. Continue mission-specific meteorological assessment.
+
+2023-01-15 03:45:00 | CBH_FALLING | Grid: 9.375, 95.875
+Recommendation: Cloud-base height is falling across successive observations. Review local cloud-base conditions against mission-specific operating limits.
+
+2023-01-15 16:15:00 | CBH_FALLING | Grid: 25.125, 89.625
+Recommendation: Cloud-base height is falling across successive observations. Review local cloud-base conditions against mission-specific operating limits.
+
+12. TEMPORAL ANALYSIS INTERPRETATION AND LIMITATIONS
+----------------------------------------------------------------------
+- Trends are based only on observed timestamps; no interpolation is performed.
+- CBH is aggregated from cloudy pixels with valid CBH only.
+- Precipitation presence is defined as one or more detected pixels in an assessable grid/time group.
+- Synthetic input is for pipeline testing and is not scientific validation.
+
+Temporal trends are calculated from successive assessable observations in the same grid cell.
+CBH trends use cloudy pixels with valid non-negative CBH.
+Precipitation transitions use the configured rain-probability threshold.
+Rainfall-rate comparisons use detected-rain pixels only.
+A missing observation is not treated as no rain or as a stable condition.
+
+END OF REPORT

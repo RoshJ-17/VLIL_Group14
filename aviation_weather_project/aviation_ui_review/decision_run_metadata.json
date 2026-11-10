@@ -1,0 +1,32 @@
+{
+  "input": "/home/m_prathilothamai/aviation_weather_project/data/processed/pipeline_batches/real_modis_2023015_v2/predictions/real_modis_2023015_v2_predictions.csv",
+  "rows": 427597,
+  "columns_used": {
+    "timestamp": "timestamp",
+    "lat": "lat",
+    "lon": "lon",
+    "cloud": "cloud_type_id",
+    "cbh": "CBH_km",
+    "rain_prob": "rain_probability",
+    "rain_rate": "rainfall_intensity_conditional_mm_hr"
+  },
+  "grid_size_degrees": 0.25,
+  "minimum_assessable_pixels_per_grid_timestamp": 10,
+  "rain_probability_threshold": 0.33,
+  "low_cbh_reference_km": 1.5,
+  "rainfall_bands_mm_hr": {
+    "light_from": 0.1,
+    "moderate_from": 2.0,
+    "heavy_from": 4.0
+  },
+  "advisory_levels": [
+    "Low",
+    "Moderate",
+    "High",
+    "Insufficient_Data"
+  ],
+  "critical_assigned": false,
+  "grid_policy": "All grid/time groups retained; groups below minimum are labelled Insufficient_Data. Regional grid-based advisory distributions exclude insufficient grid cells.",
+  "regional_reporting": "Timestamp summary reports pixel-weighted metrics over assessable grid cells and equal-weight means across assessable grid cells separately.",
+  "warning": "Project-defined provisional rules, not official aviation risk categories."
+}

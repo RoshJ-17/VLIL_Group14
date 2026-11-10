@@ -1,0 +1,29 @@
+{
+  "input_file": "/home/m_prathilothamai/aviation_weather_project/data/processed/pipeline_batches/real_modis_2023015_v2/predictions/real_modis_2023015_v2_predictions.csv",
+  "grid_size_degrees": 0.25,
+  "minimum_assessable_pixels_per_grid_timestamp": 10,
+  "low_cbh_reference_km": 1.5,
+  "rain_probability_threshold": 0.33,
+  "window_minutes": 15,
+  "grid_time_records": 26715,
+  "assessable_grid_time_records": 20937,
+  "grid_cells_spanning_window": 6969,
+  "temporal_event_records": 4,
+  "event_counts": {
+    "CBH_FALLING": 3,
+    "CBH_RISING": 1
+  },
+  "outputs": {
+    "grid_analysis": "/home/m_prathilothamai/aviation_weather_project/data/outputs/aviation_decision_support/real_modis_2023015_v2/temporal/temporal_grid_analysis.csv",
+    "event_log": "/home/m_prathilothamai/aviation_weather_project/data/outputs/aviation_decision_support/real_modis_2023015_v2/temporal/temporal_event_log.csv",
+    "timeline": "/home/m_prathilothamai/aviation_weather_project/data/outputs/aviation_decision_support/real_modis_2023015_v2/temporal/temporal_timeline.csv",
+    "text_report": "/home/m_prathilothamai/aviation_weather_project/data/outputs/aviation_decision_support/real_modis_2023015_v2/temporal/temporal_operational_report.txt",
+    "json_report": "/home/m_prathilothamai/aviation_weather_project/data/outputs/aviation_decision_support/real_modis_2023015_v2/temporal/temporal_operational_report.json"
+  },
+  "limitations": [
+    "Trends are based only on observed timestamps; no interpolation is performed.",
+    "CBH is aggregated from cloudy pixels with valid CBH only.",
+    "Precipitation presence is defined as one or more detected pixels in an assessable grid/time group.",
+    "Synthetic input is for pipeline testing and is not scientific validation."
+  ]
+}
