@@ -440,10 +440,6 @@ def generate_pdf_report(batch_id, outputs):
                     Paragraph(f"<b>{escape(event_type)}</b>", table_cell_style),
                 ],
                 [
-                    Paragraph("Timestamp", table_header_style),
-                    Paragraph(escape(timestamp), table_cell_style),
-                ],
-                [
                     Paragraph("Grid Center", table_header_style),
                     Paragraph(escape(coord_str), table_cell_style),
                 ],
@@ -1026,12 +1022,10 @@ if (
 
             with st.container():
                 st.markdown(f"#### Event {idx + 1}: `{event_type}`")
-                cols = st.columns(3)
+                cols = st.columns(2)
                 with cols[0]:
-                    st.write(f"**Timestamp:** {timestamp}")
-                with cols[1]:
                     st.write(f"**Grid Center:** {coord_str}")
-                with cols[2]:
+                with cols[1]:
                     st.write(f"**CBH Transition:** {cbh_str}")
 
                 if rain_str != "None / Not Applicable":

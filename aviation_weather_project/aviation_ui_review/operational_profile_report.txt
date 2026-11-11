@@ -6,7 +6,6 @@ Batch ID: real_modis_2023015_v2
 ----------------------------------------------------------------------
 Total pixels processed: 427,597
 Grid/time groups: 26,715
-Timestamps: 10
 
 2. ADVISORY LEVEL DISTRIBUTION
 ----------------------------------------------------------------------
@@ -42,7 +41,6 @@ MILITARY-SPECIFIC RECOMMENDATIONS
 5. TIMESTAMP-WISE WEATHER SUMMARY
 ----------------------------------------------------------------------
 
-Timestamp: 2023-01-15 03:35:00
   Total pixels: 7820
   Assessable pixels: 7820
   Low advisory pixels: 7817
@@ -54,7 +52,6 @@ Timestamp: 2023-01-15 03:35:00
   Mean detected rain rate: None mm/hr
   Maximum detected rain rate: None mm/hr
 
-Timestamp: 2023-01-15 03:40:00
   Total pixels: 32008
   Assessable pixels: 32008
   Low advisory pixels: 23031
@@ -66,7 +63,6 @@ Timestamp: 2023-01-15 03:40:00
   Mean detected rain rate: None mm/hr
   Maximum detected rain rate: None mm/hr
 
-Timestamp: 2023-01-15 03:45:00
   Total pixels: 9963
   Assessable pixels: 9963
   Low advisory pixels: 9255
@@ -78,7 +74,6 @@ Timestamp: 2023-01-15 03:45:00
   Mean detected rain rate: 0.6488338626530612 mm/hr
   Maximum detected rain rate: 1.4288146 mm/hr
 
-Timestamp: 2023-01-15 05:15:00
   Total pixels: 84900
   Assessable pixels: 84900
   Low advisory pixels: 79546
@@ -90,7 +85,6 @@ Timestamp: 2023-01-15 05:15:00
   Mean detected rain rate: None mm/hr
   Maximum detected rain rate: None mm/hr
 
-Timestamp: 2023-01-15 05:20:00
   Total pixels: 88325
   Assessable pixels: 88325
   Low advisory pixels: 68558
@@ -102,7 +96,6 @@ Timestamp: 2023-01-15 05:20:00
   Mean detected rain rate: 1.9103473086065568 mm/hr
   Maximum detected rain rate: 3.6026735 mm/hr
 
-Timestamp: 2023-01-15 06:50:00
   Total pixels: 32
   Assessable pixels: 32
   Low advisory pixels: 21
@@ -114,7 +107,6 @@ Timestamp: 2023-01-15 06:50:00
   Mean detected rain rate: None mm/hr
   Maximum detected rain rate: None mm/hr
 
-Timestamp: 2023-01-15 16:10:00
   Total pixels: 106178
   Assessable pixels: 106178
   Low advisory pixels: 88063
@@ -126,7 +118,6 @@ Timestamp: 2023-01-15 16:10:00
   Mean detected rain rate: 2.312490670509745 mm/hr
   Maximum detected rain rate: 6.5957894 mm/hr
 
-Timestamp: 2023-01-15 16:15:00
   Total pixels: 76340
   Assessable pixels: 76340
   Low advisory pixels: 73030
@@ -138,7 +129,6 @@ Timestamp: 2023-01-15 16:15:00
   Mean detected rain rate: 1.2143170675883257 mm/hr
   Maximum detected rain rate: 3.4640768 mm/hr
 
-Timestamp: 2023-01-15 17:45:00
   Total pixels: 8086
   Assessable pixels: 8086
   Low advisory pixels: 3743
@@ -150,7 +140,6 @@ Timestamp: 2023-01-15 17:45:00
   Mean detected rain rate: 1.0835832918032786 mm/hr
   Maximum detected rain rate: 2.2981045 mm/hr
 
-Timestamp: 2023-01-15 17:50:00
   Total pixels: 13945
   Assessable pixels: 13945
   Low advisory pixels: 10429
@@ -187,7 +176,6 @@ CBH_RISING: 1
 ----------------------------------------------------------------------
 
 Event: CBH_FALLING
-Timestamp: 2023-01-15 03:45:00
 Grid location: 9.375, 95.375
 Previous CBH: 10.0839267 km
 Current CBH: 10.066586433333333 km
@@ -198,7 +186,6 @@ Previous mean rain rate: None mm/hr
 Current mean rain rate: None mm/hr
 
 Event: CBH_RISING
-Timestamp: 2023-01-15 03:45:00
 Grid location: 9.375, 95.625
 Previous CBH: 10.123970678571428 km
 Current CBH: 10.319468857142857 km
@@ -209,7 +196,6 @@ Previous mean rain rate: None mm/hr
 Current mean rain rate: None mm/hr
 
 Event: CBH_FALLING
-Timestamp: 2023-01-15 03:45:00
 Grid location: 9.375, 95.875
 Previous CBH: 10.311783852941176 km
 Current CBH: 10.28590495 km
@@ -220,7 +206,6 @@ Previous mean rain rate: None mm/hr
 Current mean rain rate: None mm/hr
 
 Event: CBH_FALLING
-Timestamp: 2023-01-15 16:15:00
 Grid location: 25.125, 89.625
 Previous CBH: 1.5506665599999998 km
 Current CBH: 1.5062882 km

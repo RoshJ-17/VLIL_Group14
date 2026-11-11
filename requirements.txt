@@ -8,3 +8,15 @@ matplotlib
 seaborn
 scipy
 requests
+joblib
+
+# UI & Dashboard Requirements
+streamlit>=1.35.0
+reportlab>=4.0.0
+
+# Satellite Data Ingestion (MODIS HDF)
+pyhdf
+
+# Model Architecture Dependencies
+tabm
+rtdl_num_embeddings

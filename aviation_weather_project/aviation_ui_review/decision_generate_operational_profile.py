@@ -278,7 +278,6 @@ def main():
     for row in records_from_dataframe(timestamp):
         lines.extend([
             "",
-            f"Timestamp: {row.get('decision_timestamp')}",
             f"  Total pixels: {row.get('total_input_pixels')}",
             f"  Assessable pixels: {row.get('assessable_pixels')}",
             f"  Low advisory pixels: {row.get('low_pixels')}",
@@ -349,7 +348,6 @@ def main():
                 lines.extend([
                     "",
                     f"Event: {row.get('event_type')}",
-                    f"Timestamp: {row.get('timestamp')}",
                     f"Grid location: {row.get('grid_lat_center')}, "
                     f"{row.get('grid_lon_center')}",
                     f"Previous CBH: {row.get('previous_cbh_km')} km",
@@ -375,7 +373,6 @@ def main():
             for row in records_from_dataframe(temporal_events):
                 lines.extend([
                     "",
-                    f"{row.get('timestamp')} | "
                     f"{row.get('event_type')} | "
                     f"Grid: {row.get('grid_lat_center')}, "
                     f"{row.get('grid_lon_center')}",
