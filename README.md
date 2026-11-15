@@ -9,6 +9,28 @@ The framework covers four weather-estimation tasks: cloud-type classification, c
 **Study region:** India  
 **Study period:** July 1, 2022, to June 30, 2023
 
+## Primary User Interface
+
+The primary setup and execution resource is the Streamlit aviation-weather interface:
+
+```text
+aviation_weather_project/aviation_ui_review/
+├── app.py
+└── decision_batch_pipeline.py
+```
+
+The UI accepts MODIS MOD06_L2 and MOD021KM files, runs the four-model inference workflow, applies aviation decision-support rules, performs temporal analysis, and presents the resulting weather assessment and operational reports.
+
+## Project Objectives
+
+- Classify cloud type from satellite-derived atmospheric features.
+- Estimate cloud-base height (CBH) in metres.
+- Detect precipitation using binary classification.
+- Estimate rainfall intensity in mm/h.
+- Integrate the four predictions into a unified aviation weather assessment.
+- Identify spatial weather patterns and temporal changes.
+- Generate aviation-focused operational reports and recommendations.
+
 ## Features Summary
 
 ### 1. Multisource Weather Data Integration
@@ -47,8 +69,9 @@ The framework covers four weather-estimation tasks: cloud-type classification, c
 - Separates trained model artifacts from evaluation outputs.
 
 ### 8. Aviation Weather Decision Support
-- Establishes a foundation for combining cloud, cloud-base-height, precipitation, and rainfall-intensity estimates.
-- Can support future integration of regional cloud coverage, temporal weather trends, hazard persistence, and rule-based risk indicators.
+- Combines cloud, cloud-base-height, precipitation, and rainfall-intensity predictions.
+- Performs spatial aggregation, temporal trend analysis, and event detection.
+- Generates operational profiles and aviation-focused recommendations.
 - Provides a basis for adding model-explanation methods such as SHAP.
 
 > This repository is intended for research and decision-support development. It is not a certified aviation weather forecasting or operational air-traffic-control system.
@@ -266,6 +289,15 @@ The source datasets differ in format, resolution, and temporal coverage. Preproc
 
 ## Models and Training Workflows
 
+The operational UI integrates four task-specific model outputs:
+
+| Model | Task | Output |
+|---|---|---|
+| Cloud Type | Multiclass classification | Predicted cloud type |
+| CBH | Regression | Cloud-base height (m) |
+| Precipitation | Binary classification | Rain / No Rain |
+| Rainfall Intensity | Regression | Rainfall intensity (mm/h) |
+
 | Task | Training script | Model artifact |
 |---|---|---|
 | Cloud-base-height estimation | `training/cbh/train_cbh_tabnet_mixed_stratified.py` | `models/cbh/cbh_tabnet_mixed_stratified_model.zip` |
@@ -314,10 +346,10 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Additional packages may be required depending on the scripts you intend to run:
+Install the packages required by the primary UI:
 
 ```bash
-pip install pyhdf beautifulsoup4 xarray netCDF4 joblib
+pip install streamlit reportlab pyhdf beautifulsoup4 xarray netCDF4 joblib
 pip install pytorch-tabnet tab-transformer-pytorch imbalanced-learn
 ```
 
@@ -351,7 +383,36 @@ pip install pyhdf
 
 If installation fails, check that your compiler can locate the HDF4 headers and libraries. The exact configuration may vary by Mac architecture and Python version.
 
-### 6. CPU and GPU Support
+### 6. Run the Aviation Weather UI
+
+The UI is the primary way to run the operational workflow:
+
+```bash
+cd aviation_weather_project/aviation_ui_review
+streamlit run app.py
+```
+
+Open the local Streamlit URL shown in the terminal. Upload matching MODIS `MOD06_L2` and `MOD021KM` HDF files through the interface and start the batch processing workflow.
+
+The UI runs `decision_batch_pipeline.py` and performs:
+
+1. MODIS data extraction and feature preparation.
+2. Four-model inference for cloud type, CBH, precipitation, and rainfall intensity.
+3. Conditional rainfall-intensity estimation: precipitation events are passed to the rainfall-intensity model; otherwise, rainfall intensity is assigned zero.
+4. Spatial aggregation and aviation decision-support rule evaluation.
+5. Temporal trend and event analysis.
+6. Unified operational profile and report generation.
+
+Generated outputs are written under:
+
+```text
+aviation_weather_project/data/outputs/aviation_decision_support/
+aviation_weather_project/data/processed/pipeline_batches/
+```
+
+The UI expects the trained model and preprocessing artifacts configured in `aviation_weather_project/aviation_ui_review/app.py`.
+
+### 7. CPU and GPU Support
 
 The scripts may run on a CPU, although training can take longer for large datasets.
 
