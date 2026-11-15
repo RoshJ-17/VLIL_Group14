@@ -298,15 +298,6 @@ The operational UI integrates four task-specific model outputs:
 | Precipitation | Binary classification | Rain / No Rain |
 | Rainfall Intensity | Regression | Rainfall intensity (mm/h) |
 
-| Task | Training script | Model artifact |
-|---|---|---|
-| Cloud-base-height estimation | `training/cbh/train_cbh_tabnet_mixed_stratified.py` | `models/cbh/cbh_tabnet_mixed_stratified_model.zip` |
-| Cloud-type classification | `training/cloud_type/08_train_cloudtype_fttransformer.py` | `models/cloud_type/best_model.pt` |
-| Precipitation detection | `training/precipitation_detection/06_train_precip_tcn.py` | `models/precipitation_detection/precipitation_tcn.pt` |
-| Rainfall-intensity estimation | `training/rainfall_intensity/14_train_precip_rate_residual_mlp_v2_smote.py` | `models/rainfall_intensity/precip_rate_residual_mlp_v2_smote.pt` |
-
-The script and artifact names above describe the repository layout. The actual architecture, training options, input features, and target definitions should be verified in the corresponding source files.
-
 ## Installation and Setup
 
 ### Prerequisites
@@ -477,26 +468,6 @@ The general preparation workflow is:
 7. Verify the resulting files before training.
 
 Refer to the README files within the relevant preprocessing directories for additional instructions.
-
-## Running Training Scripts
-
-Run a training script from the repository root after installing its dependencies and preparing its expected input data.
-
-For example, the cloud-base-height training script is located at:
-
-```bash
-python training/cbh/train_cbh_tabnet_mixed_stratified.py
-```
-
-Other training scripts are located at:
-
-```text
-training/cloud_type/08_train_cloudtype_fttransformer.py
-training/precipitation_detection/06_train_precip_tcn.py
-training/rainfall_intensity/14_train_precip_rate_residual_mlp_v2_smote.py
-```
-
-Before running a script, inspect its configuration and confirm that the input paths, output paths, required arguments, and device settings match your environment. The command above assumes the script can be launched directly from the repository root without additional command-line arguments.
 
 ## Evaluation and Results
 
