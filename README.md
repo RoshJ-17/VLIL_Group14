@@ -65,19 +65,32 @@ VLIL_Group14/
 ├── data/
 │   ├── raw/
 │   │   └── modis/
-│   │       └── MOD021KM / MOD06_L2 ZIP and chunk files
-│   │
+│   │       ├── MOD021KM.A2023111.0345.061.2023111131202.z01
+│   │       ├── MOD021KM.A2023111.0345.061.2023111131202.z02
+│   │       ├── MOD021KM.A2023111.0345.061.2023111131202.z03
+│   │       ├── MOD021KM.A2023111.0345.061.2023111131202.zip
+│   │       ├── MOD06_L2.A2023111.0345.061.2023134235838.z01
+│   │       ├── MOD06_L2.A2023111.0345.061.2023134235838.z02
+│   │       ├── MOD06_L2.A2023111.0345.061.2023134235838.zip
+│   │       └── README.md
 │   └── processed/
 │       ├── cbh/
-│       │   └── train / val / test CSVs
+│       │   ├── cbh_mixed_stratified_test.csv
+│       │   ├── cbh_mixed_stratified_train.csv.zip
+│       │   └── cbh_mixed_stratified_val.csv
 │       ├── cloud_type/
-│       │   └── train / val / test CSVs
+│       │   ├── cloudtype_test.csv
+│       │   ├── cloudtype_train.csv
+│       │   └── cloudtype_val.csv
 │       ├── pixel_level/
 │       │   └── modis_pixel.csv
 │       ├── precipitation_detection/
-│       │   └── processed CSV files
+│       │   ├── modis_gpm_precip.csv
+│       │   └── modis_gpm_precip_detection.csv
 │       └── rainfall_intensity/
-│           └── train / val / test CSVs
+│           ├── precip_positive_modis_mixed_test.csv
+│           ├── precip_positive_modis_mixed_train.csv
+│           └── precip_positive_modis_mixed_val.csv
 │
 ├── dataset/
 │   ├── download.py
@@ -89,48 +102,61 @@ VLIL_Group14/
 │   │   ├── 05_create_cloud_labels.py
 │   │   ├── 06_create_cloudtype_final.py
 │   │   └── 07_split_cloudtype_dataset.py
-│   │
 │   ├── era5/
 │   │   ├── 03_match_era5_cbh.py
 │   │   ├── 04_prepare_cbh_v2.py
+│   │   ├── README.md
 │   │   └── create_cbh_mixed_day_stratified_split.py
-│   │
+│   ├── gpm/
+│   │   ├── 04_match_gpm_precip.py
+│   │   ├── 06_create_precip_labels.py
+│   │   ├── 08_create_precip_positive_modis_dataset.py
+│   │   ├── 12_create_mixed_day_precip_split.py
+│   │   └── README.md
 │   └── modis/
 │       ├── 01_modis_extraction.py
-│       └── 02_combine_modis_chunks.py
+│       ├── 02_combine_modis_chunks.py
+│       └── README.md
 │
-├── scripts/
-│   ├── person1/
-│   │   ├── 04_download_era5_cbh.py
-│   │   ├── 06_download_era5_cbh_team_netcdf_person1.py
-│   │   ├── 06_verify_gpm_processed.py
-│   │   └── check_modis_dates.py
-│   │
-│   ├── person2/
-│   │   ├── 05_build_era5_required_cells.py
-│   │   ├── 05_download_era5_cbh_targeted.py
-│   │   ├── 05_download_extract_gpm.py
-│   │   ├── 06_download_era5_cbh_team_netcdf_person5.py
-│   │   ├── check_era5_requirements.py
-│   │   ├── era5_required_cells_temp.sqlite
-│   │   └── nano.save
-│   │
-│   ├── person3/
-│   │   ├── pairs.txt
-│   │   ├── 06_download_era5_cbh_team_netcdf_person2.py
-│   │   ├── 06_download_era5_cbh_team_netcdf_person4.py
-│   │   ├── 06_download_era5_cbh_team_netcdf_person6.py
-│   │   ├── check_values1709.py
-│   │   ├── match1509.py
-│   │   └── run_modis.pbs
-│   │
-│   └── person4/
-│       ├── 05_create_cloud_labels2.py
-│       ├── 06_create_cloudtype_final2.py
-│       ├── 06_download_era5_cbh_team_netcdf_person3.py
-│       ├── 07_match_modis_gpm.py
-│       ├── era5_download.log
-│       └── make_gpm_required_times.py
+├── preprocessEDA/
+│   ├── CBH/
+│   │   ├── 08_audit_cbh_sampling.py
+│   │   └── cbh_inspect_dataset.py
+│   ├── cloudType/
+│   │   ├── cloudType_analyse_btd_by_class.py
+│   │   ├── cloudType_analyze_split_class_distribution.py
+│   │   ├── cloudType_check_bt_extremes.py
+│   │   ├── cloudType_correct_duplicate_check.py
+│   │   ├── cloudType_diagnose_duplicate_reading.py
+│   │   ├── cloudType_final_duplicate_verification.py
+│   │   ├── cloudType_hpc_cpu_diagnostic.py
+│   │   ├── cloudType_investigate_extreme_btd.py
+│   │   ├── cloudType_investigate_repeated_bt_values.py
+│   │   ├── cloudType_prepare_tabm_data.py
+│   │   ├── cloudType_preprocess_and_split.py
+│   │   ├── cloudType_remove_confirmed_bt_extremes.py
+│   │   ├── cloudType_scale_features.py
+│   │   ├── cloudType_validate_cleaned_dataset.py
+│   │   └── run_eda_cloudtype.py
+│   └── modis/
+│       ├── 01_modis_extractionNew.py
+│       ├── 04_match_gpm_precip.py
+│       ├── 04_merge_cloudtype_gpm.py
+│       ├── 09_eda_01_overview.py
+│       ├── 09_eda_02_data_quality.py
+│       ├── 09_eda_03_feature_analysis.py
+│       ├── 09_eda_04_temporal_analysis.py
+│       ├── 09_eda_05_coverage_missingness.py
+│       ├── 09_eda_06_spatial_coverage.py
+│       ├── 09_eda_07_cth_ctt_missingness.py
+│       ├── 09_eda_08_spatially_controlled_missingness.py
+│       ├── 09_eda_09_categorical_analysis.py
+│       ├── 09_eda_10_numeric_extremes.py
+│       ├── 09_eda_11_inspect_extreme_records.py
+│       ├── 09_eda_12_suspect_value_counts.py
+│       ├── 09_eda_13_global_duplicates.py
+│       ├── 09_prepare_01_remove_suspect_bt.py
+│       └── audit_missing_values.py
 │
 ├── training/
 │   ├── cbh/
@@ -144,17 +170,77 @@ VLIL_Group14/
 │
 ├── evaluation/
 │   ├── cbh/
-│   │   ├── feature_importance.csv
-│   │   └── metrics.json
+│   │   ├── cbh_tabnet_mixed_stratified_feature_importance.csv
+│   │   └── cbh_tabnet_mixed_stratified_metrics.json
 │   ├── cloud_type/
 │   │   ├── classification_report.txt
 │   │   ├── config.json
 │   │   └── confusion_matrix.csv
 │   ├── precipitation_detection/
-│   │   └── evaluation result CSV files
+│   │   ├── precipitation_tcn_fine_threshold_results.csv
+│   │   ├── precipitation_tcn_test_predictions.csv
+│   │   └── precipitation_tcn_threshold_results.csv
 │   └── rainfall_intensity/
-│       └── evaluation result CSV files
+│       ├── precip_rate_residual_mlp_v2_smote_intensity_evaluation.csv
+│       └── precip_rate_residual_mlp_v2_smote_test_predictions.csv
 │
+├── modelTraining/
+│   └── CBH/
+│       ├── 07_train_tabm_cbh.py
+│       ├── compare_tabm_checkpoints.py
+│       ├── prepare_tabm_full.py
+│       ├── prepare_tabm_regression.py
+│       ├── tabm_regression_baseline.py
+│       ├── tabm_regression_huber.py
+│       ├── tabm_regression_train.py
+│       └── tabm_regression_weighted.py
+│
+├── modelEvaluation/
+│   ├── CBH/
+│   │   └── decision_validate_predictions.py
+│   └── operational/
+│       ├── decision_audit_gpm_target.py
+│       ├── decision_audit_inputs.py
+│       ├── decision_check_timestamp_format.py
+│       ├── decision_count_monthly_records.py
+│       └── decision_scientific_validation.py
+│
+├── decisionSupport/
+│   ├── analysis/
+│   │   ├── decision_generate_geographical_heatmaps.py
+│   │   ├── decision_geographical_analysis.py
+│   │   ├── decision_monthly_analysis.py
+│   │   ├── decision_rainfall_intensity_analysis.py
+│   │   ├── decision_regional_case_studies.py
+│   │   ├── decision_regional_grid_analysis.py
+│   │   ├── decision_regional_grid_sensitivity.py
+│   │   ├── decision_seasonal_analysis.py
+│   │   └── decision_seasonal_geographical_analysis.py
+│   ├── inference/
+│   │   ├── decision_integrated_inference.py
+│   │   └── decision_integrated_inference_full_year.py
+│   └── rules/
+│       ├── decisionValidate_fullYear_gridLevel.py
+│       ├── decisionValidate_fullYear_pixelLevelRules.py
+│       ├── decision_apply_rules.py
+│       ├── decision_apply_rules_chunked.py
+│       ├── decision_combine_modis_chunks.py
+│       └── decision_generate_operational_profile.py
+│
+├── aviation_weather_project/
+│   └── aviation_ui_review/
+│       ├── 01_modis_extractionNew.py
+│       ├── app.py
+│       ├── decision_apply_rules.py
+│       ├── decision_batch_pipeline.py
+│       ├── decision_combine_modis_chunks.py
+│       ├── decision_generate_operational_profile.py
+│       ├── decision_integrated_inference.py
+│       ├── decision_run_metadata.json
+│       ├── decision_temporal_analysis.py
+│       ├── operational_profile_report.txt
+│       └── temporal_operational_report.json
+|
 └── models/
     ├── cbh/
     │   └── cbh_tabnet_mixed_stratified_model.zip
