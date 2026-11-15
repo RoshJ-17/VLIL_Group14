@@ -287,7 +287,7 @@ VLIL_Group14/
 
 The source datasets differ in format, resolution, and temporal coverage. Preprocessing scripts are used to extract, match, and prepare data for the downstream tasks.
 
-## Models and Training Workflows
+## Models
 
 The operational UI integrates four task-specific model outputs:
 
@@ -448,14 +448,6 @@ chmod 600 ~/.netrc
 Replace the placeholders with your own credentials. Never commit `.netrc`, passwords, or access tokens to GitHub. Follow the current NASA Earthdata instructions if a particular service requires a different authentication method.
 
 ## Dataset Preparation
-
-The repository separates raw data from processed data.
-
-- `data/raw/` is intended for source datasets organized by data source.
-- `data/processed/` contains task-specific prepared datasets.
-- `dataset/` contains general dataset download utilities.
-- `preprocessing/` contains source-specific extraction, matching, label creation, and dataset preparation scripts.
-- `scripts/` contains supporting data-acquisition, verification, matching, and team workflow utilities.
 
 The general preparation workflow is:
 
